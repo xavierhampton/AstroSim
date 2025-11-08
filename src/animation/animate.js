@@ -1,9 +1,12 @@
 import * as CANNON from 'cannon-es';
 import * as THREE from 'three'
+import { applyNBodyGravity, spawnExplosion, deformEarth } from "./animateDestruction.js"
 
+let clouds;
+let sphere;
 function animate(meshmap, controls, render, stats, world, scene) {
-  const sphere = meshmap["sphere"];
-  const clouds = meshmap["clouds"];
+  sphere = meshmap["sphere"];
+  clouds = meshmap["clouds"];
   const speed = 0.00001;
   const xspeed = 6;
 
@@ -12,13 +15,11 @@ function animate(meshmap, controls, render, stats, world, scene) {
 
   function loop() {
     requestAnimationFrame(loop);
-
-
-    // Rotate sphere & clouds
-    sphere.rotation.x += xspeed * speed;
-    sphere.rotation.y += 20 * speed;
-    clouds.rotation.x += xspeed * speed;
-    clouds.rotation.y += 20 * speed;
+    // // Rotate sphere & clouds
+    // sphere.rotation.x += xspeed * speed;
+    // sphere.rotation.y += 20 * speed;
+    // clouds.rotation.x += xspeed * speed;
+    // clouds.rotation.y += 20 * speed;
 
     if (clouds.material.map) {
       clouds.material.map.offset.x -= 0.2 * xspeed * speed;
@@ -54,22 +55,25 @@ function animate(meshmap, controls, render, stats, world, scene) {
 
           // Attach collision listener once
           if (!body.hasCollisionListener && sphere.userData.physicsBody) {
-  body.addEventListener('collide', (event) => {
-    if (event.body === sphere.userData.physicsBody) {
-      // Compute collision point in world coordinates
-      const cp = new CANNON.Vec3();
-      event.contact.rj.vadd(event.body.position, cp);
-      const contactPoint = new THREE.Vector3(cp.x, cp.y, cp.z);
+            body.addEventListener('collide', (event) => {
+              if (event.body === sphere.userData.physicsBody) {
+                // Compute collision point in world coordinates
+                const cp = new CANNON.Vec3();
+                event.contact.rj.vadd(event.body.position, cp);
+                let contactPoint = new THREE.Vector3(cp.x, cp.y, cp.z);
 
-      // Create one big crater
-      deformEarth(sphere, contactPoint, 2, 1.5); // increase radius & strength for bigger crater
-      spawnExplosion(scene, contactPoint, 100);
+                // Mirror the collision point through the center of the sphere
+                const spherePos = sphere.position.clone();
+                contactPoint = contactPoint.clone().sub(spherePos).multiplyScalar(-1).add(spherePos);
 
+                // Create one big crater on the opposite side
+                deformEarth(sphere, clouds, contactPoint, 2, 1.5);
+                spawnExplosion(scene, contactPoint, 100);
+              }
+            });
+            body.hasCollisionListener = true;
+          }
 
-    }
-  });
-  body.hasCollisionListener = true;
-}
 
         });
       } else {
@@ -81,6 +85,7 @@ function animate(meshmap, controls, render, stats, world, scene) {
     });
 
     clouds.position.copy(sphere.position);
+    clouds.quaternion.copy(sphere.quaternion)
     // Update controls, render, stats
     controls.target.copy(sphere.position); 
     controls.update();
@@ -91,115 +96,4 @@ function animate(meshmap, controls, render, stats, world, scene) {
   loop();
 }
 
-//N -body gravity function
-function applyNBodyGravity(bodies, G = 1) {
-  for (let i = 0; i < bodies.length; i++) {
-    const bi = bodies[i];
-    if (bi.mass === 0) continue;
-
-    for (let j = i + 1; j < bodies.length; j++) {
-      const bj = bodies[j];
-      if (bj.mass === 0) continue;
-
-      const rVec = new CANNON.Vec3();
-      bj.position.vsub(bi.position, rVec);
-
-      const distSq = rVec.lengthSquared() + 0.001; // avoid divide by zero
-      const forceMag = (G * bi.mass * bj.mass) / distSq;
-
-      rVec.normalize();
-      const force = rVec.scale(forceMag);
-
-      bi.applyForce(force, bi.position);
-      bj.applyForce(force.scale(-1), bj.position);
-    }
-  }
-}
-
-function deformEarth(earthMesh, collisionPoint, radius = 1, strength = 0.5) {
-  // Convert collision point to local space of the sphere
-  const localCollision = collisionPoint.clone();
-  earthMesh.worldToLocal(localCollision);
-
-  const meshesToDeform = [earthMesh];
-  // Add rim sphere if it exists
-  if (earthMesh.children.length > 0) {
-    meshesToDeform.push(earthMesh.children[0]);
-  }
-
-  const center = new THREE.Vector3(0, 0, 0);
-  const tempVec = new THREE.Vector3();
-
-  meshesToDeform.forEach((mesh) => {
-    const position = mesh.geometry.attributes.position;
-
-    for (let i = 0; i < position.count; i++) {
-      tempVec.fromBufferAttribute(position, i);
-
-      const dist = tempVec.distanceTo(localCollision);
-      if (dist < radius) {
-        const push = (1 - dist / radius) * strength;
-
-        // Radial direction from center to vertex
-        const radialDir = tempVec.clone().sub(center).normalize();
-
-        // Move vertex inward to form crater
-        tempVec.addScaledVector(radialDir, -push);
-
-        position.setXYZ(i, tempVec.x, tempVec.y, tempVec.z);
-      }
-    }
-
-    position.needsUpdate = true;
-    mesh.geometry.computeVertexNormals();
-  });
-}
-
-
-
-
-
-
-function spawnExplosion(scene, position, numParticles = 50) {
-  const geometry = new THREE.BufferGeometry();
-  const vertices = [];
-
-  for (let i = 0; i < numParticles; i++) {
-    vertices.push(position.x, position.y, position.z);
-  }
-  geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
-
-  const material = new THREE.PointsMaterial({ color: 0xffaa33, size: 0.2 });
-  const points = new THREE.Points(geometry, material);
-  scene.add(points);
-
-  const velocities = [];
-  for (let i = 0; i < vertices.length / 3; i++) {
-    velocities.push(new THREE.Vector3(
-      (Math.random() - 0.5) * 0.2,
-      (Math.random() - 0.5) * 0.2,
-      (Math.random() - 0.5) * 0.2
-    ));
-  }
-
-  let t = 0;
-  function explode() {
-    t++;
-    const pos = points.geometry.attributes.position;
-    for (let i = 0; i < pos.count; i++) {
-      const v = velocities[i];
-      pos.setXYZ(i,
-        pos.getX(i) + v.x,
-        pos.getY(i) + v.y,
-        pos.getZ(i) + v.z
-      );
-    }
-    pos.needsUpdate = true;
-
-    if (t < 30) requestAnimationFrame(explode);
-    else scene.remove(points);
-  }
-  explode();
-}
-
-export { animate };
+export {animate}

@@ -16,6 +16,7 @@ const sphere = createSphere();
 meshmap["sphere"] = sphere;
 const clouds = createClouds();
 meshmap["clouds"] = clouds;
+
 Object.values(meshmap).forEach((mesh) => {
   if (!Array.isArray(mesh)) {
     scene.add(mesh);

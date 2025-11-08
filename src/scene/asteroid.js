@@ -63,7 +63,7 @@ function createAsteroid(baseRadius = 1) {
 }
 
 
-function spawnAsteroid(asteroid, camera, world, scene, asteroids) {
+function spawnAsteroid(asteroid, camera, world, scene, asteroids, mass, size) {
   // --- Define spawn point some units in front of camera ---
   const planeDistance = 10; // distance in front of camera
   const spawnPoint = new THREE.Vector3();
@@ -82,9 +82,7 @@ function spawnAsteroid(asteroid, camera, world, scene, asteroids) {
   asteroid.userData.velocity = velocity;
 
   // --- Add physics ---
-  // Use sphere shape for stability - complex shapes cause crashes on asteroid-asteroid collisions
-  const avgScale = (asteroid.scale.x + asteroid.scale.y + asteroid.scale.z) / 3;
-  const body = addPhysics(asteroid, world, { shapeType: 'sphere', mass: 1, radius: avgScale });
+  const body = addPhysics(asteroid, world, { shapeType: 'sphere', mass: mass, radius: size });
 
   // Reduce spinning by adding angular damping
   body.angularDamping = 0.8; // Higher = less spinning (0-1 range)

@@ -72,9 +72,8 @@ function animate(meshmap, controls, render, stats, world, scene, gui) {
               mesh.userData.exploded = true;
 
               const cp = new CANNON.Vec3();
-              event.contact.rj.vadd(event.body.position, cp);
-              let contactPoint = new THREE.Vector3(cp.x, cp.y, cp.z);
-              contactPoint = contactPoint.clone().sub(sphere.position).multiplyScalar(-1).add(sphere.position);
+              event.contact.ri.vadd(body.position, cp);
+              const contactPoint = new THREE.Vector3(cp.x, cp.y, cp.z);
 
               // Create crater and explosion
               deformEarth(sphere, clouds, contactPoint, 1, 1.5);

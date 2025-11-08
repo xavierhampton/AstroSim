@@ -38,7 +38,6 @@ function addPhysics(mesh, world, { shapeType = 'sphere', mass = 0, radius = 1 } 
   return body;
 }
 
-export { addPhysics };
 
 
-export { setupPhysics, world };
+export { setupPhysics, addPhysics, world };

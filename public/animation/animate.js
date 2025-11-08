@@ -8,7 +8,11 @@ function animate(meshmap, controls, render, stats) {
     sphere.rotation.x += xspeed * speed;
     sphere.rotation.y += 20 * speed;
     clouds.rotation.x += xspeed * speed;
-    clouds.rotation.y += 10 * speed;
+    clouds.rotation.y += 20 * speed;
+
+    if (clouds.material.map) {
+      clouds.material.map.offset.x -= 0.2 * xspeed * speed; // horizontal cloud movement
+    }
     controls.update();
     render();
     stats.update();

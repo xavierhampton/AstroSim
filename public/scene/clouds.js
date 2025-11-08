@@ -7,6 +7,9 @@ function createClouds() {
   
     const textureLoader = new THREE.TextureLoader();
     const texture = textureLoader.load('../resources/cloud_texture.png');
+
+    texture.wrapS = THREE.RepeatWrapping;
+    texture.wrapT = THREE.RepeatWrapping;
   
     const material = new THREE.MeshStandardMaterial({
         map: texture,

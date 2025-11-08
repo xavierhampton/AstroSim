@@ -22,7 +22,6 @@ function animate(meshmap, controls, render, stats, world, scene) {
     // clouds.rotation.y += 20 * speed;
 
     if (clouds.material.map) {
-      console.log("cloud pos" + clouds.material.map.offset.x);
       clouds.material.map.offset.x -= 0.3 * xspeed * speed;
     }
 
@@ -83,8 +82,7 @@ function animate(meshmap, controls, render, stats, world, scene) {
                     if (idx > -1) meshmap["asteroids"].splice(idx, 1);
                   }
               }
-                
-                world.removeBody(event.body);
+              
             });
             body.hasCollisionListener = true;
           }

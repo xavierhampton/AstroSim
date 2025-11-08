@@ -114,14 +114,14 @@ function spawnExplosion(scene, position, numParticles = 50) {
 }
 
 
-function explodeAsteroid(scene, asteroidMesh, numPieces = 20, force = 0.5) {
+function explodeAsteroid(scene, asteroidMesh, numPieces = 30, force = 0.5) {
 
   const asteroidWorldPos = new THREE.Vector3();
   asteroidMesh.getWorldPosition(asteroidWorldPos);
 
   for (let i = 0; i < numPieces; i++) {
     // Create a small shard
-    const shardRadius = 0.1 + Math.random() * 0.2;
+    const shardRadius = 0.2 + Math.random() * 0.2;
     const shardGeometry = new THREE.SphereGeometry(shardRadius, 4, 4);
 
     const material = new THREE.MeshStandardMaterial({

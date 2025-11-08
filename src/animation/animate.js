@@ -4,6 +4,7 @@ import { applyNBodyGravity, spawnExplosion, deformEarth, explodeAsteroid } from 
 
 let clouds;
 let sphere;
+
 function animate(meshmap, controls, render, stats, world, scene, gui) {
   sphere = meshmap["sphere"];
   clouds = meshmap["clouds"];
@@ -12,7 +13,10 @@ function animate(meshmap, controls, render, stats, world, scene, gui) {
   
   // N-body gravity constant
   const G = 5;
-  
+
+  // Queue of bodies to remove safely
+  const bodiesToRemove = [];
+
   function loop() {
     let timescale = gui.getTimescale();
     if (isNaN(timescale)) {
@@ -20,14 +24,9 @@ function animate(meshmap, controls, render, stats, world, scene, gui) {
     }
     console.log(timescale);
     requestAnimationFrame(loop);
-    // // Rotate sphere & clouds
-    // sphere.rotation.x += xspeed * speed;
-    // sphere.rotation.y += 20 * speed;
-    // clouds.rotation.x += xspeed * speed;
-    // clouds.rotation.y += 20 * speed;
 
+    // Rotate clouds map
     if (clouds.material.map) {
-      // console.log("cloud pos" + clouds.material.map.offset.x);
       clouds.material.map.offset.x -= 0.3 * xspeed * speed * timescale;
     }
 
@@ -46,6 +45,12 @@ function animate(meshmap, controls, render, stats, world, scene, gui) {
     // Apply N-body gravity
     applyNBodyGravity(bodies, G);
 
+    //Remove queued to remove bodies from physics world
+    while (bodiesToRemove.length > 0) {
+      const body = bodiesToRemove.pop();
+      if (body.world) body.world.removeBody(body);
+    }
+
     // Step the physics world
     world.step((1 / 60) * timescale);
 
@@ -62,39 +67,36 @@ function animate(meshmap, controls, render, stats, world, scene, gui) {
           // Attach collision listener once
           if (!body.hasCollisionListener && sphere.userData.physicsBody) {
             body.addEventListener('collide', (event) => {
-              if (event.body === sphere.userData.physicsBody) {
-                // Compute collision point in world coordinates
+              if (event.body === sphere.userData.physicsBody && !mesh.userData?.exploded) {
+                mesh.userData = mesh.userData || {};
+                mesh.userData.exploded = true;
+
                 const cp = new CANNON.Vec3();
                 event.contact.rj.vadd(event.body.position, cp);
                 let contactPoint = new THREE.Vector3(cp.x, cp.y, cp.z);
+                contactPoint = contactPoint.clone().sub(sphere.position).multiplyScalar(-1).add(sphere.position);
 
-                // Mirror the collision point through the center of the sphere
-                const spherePos = sphere.position.clone();
-                contactPoint = contactPoint.clone().sub(spherePos).multiplyScalar(-1).add(spherePos);
-
-                // Create one big crater on the opposite side
+                // Create crater and explosion
                 deformEarth(sphere, clouds, contactPoint, 2, 1.5);
                 spawnExplosion(scene, contactPoint, 100);
-                explodeAsteroid(scene, mesh); // 'mesh' is the colliding asteroid
+                explodeAsteroid(scene, mesh);
 
+                // Queue the body for removal
+                if (mesh.userData.physicsBody) {
+                  bodiesToRemove.push(mesh.userData.physicsBody);
+                  mesh.userData.physicsBody = null;
+                }
 
-
-                //Remove from world
+                // Remove mesh from scene and meshmap
                 scene.remove(mesh);
-
-                //Remove From MeshMap 
                 if (Array.isArray(meshmap["asteroids"])) {
-                    const idx = meshmap["asteroids"].indexOf(mesh);
-                    if (idx > -1) meshmap["asteroids"].splice(idx, 1);
-                  }
+                  const idx = meshmap["asteroids"].indexOf(mesh);
+                  if (idx > -1) meshmap["asteroids"].splice(idx, 1);
+                }
               }
-                
-                world.removeBody(event.body);
             });
             body.hasCollisionListener = true;
           }
-
-
         });
       } else {
         const body = entry.userData?.physicsBody;
@@ -106,6 +108,7 @@ function animate(meshmap, controls, render, stats, world, scene, gui) {
 
     clouds.position.copy(sphere.position);
     clouds.quaternion.copy(sphere.quaternion)
+
     // Update controls, render, stats
     controls.target.copy(sphere.position); 
     controls.update();
@@ -116,4 +119,4 @@ function animate(meshmap, controls, render, stats, world, scene, gui) {
   loop();
 }
 
-export {animate}
+export {animate};

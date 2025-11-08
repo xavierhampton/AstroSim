@@ -31,7 +31,7 @@ scene.add(ambient);
 
 // SPAWNS N ASTEROIDS, TEMPORARY
 const asteroids = []
-for (let i = 0; i < 1; i++) {
+for (let i = 0; i < 2; i++) {
   const asteroid = createAsteroid(
     0.5 + Math.random() * 3 // radius
   );

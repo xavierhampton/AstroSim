@@ -60,7 +60,9 @@ function createSphere() {
   earth.receiveShadow = true;
 
   //Add to physics sim
-  addPhysics(earth, world, { shapeType: 'sphere', mass: 20, radius: 3 });
+  const body = addPhysics(earth, world, { shapeType: 'sphere', mass: 200, radius: 3 });
+  body.angularDamping = 0.8;
+
   return earth;
 }
 

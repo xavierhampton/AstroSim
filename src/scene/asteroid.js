@@ -82,7 +82,12 @@ function spawnAsteroid(asteroid, camera, world, scene, asteroids) {
   asteroid.userData.velocity = velocity;
 
   // --- Add physics ---
-  addPhysics(asteroid, world, { shapeType: 'custom', mass: 1, radius: 1 });
+  // Use sphere shape for stability - complex shapes cause crashes on asteroid-asteroid collisions
+  const avgScale = (asteroid.scale.x + asteroid.scale.y + asteroid.scale.z) / 3;
+  const body = addPhysics(asteroid, world, { shapeType: 'sphere', mass: 1, radius: avgScale });
+
+  // Reduce spinning by adding angular damping
+  body.angularDamping = 0.8; // Higher = less spinning (0-1 range)
 
   // --- Track asteroid ---
   asteroids.push(asteroid);

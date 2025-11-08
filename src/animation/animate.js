@@ -19,10 +19,6 @@ function animate(meshmap, controls, render, stats, world, scene, gui) {
 
   function loop() {
     let timescale = gui.getTimescale();
-    if (isNaN(timescale)) {
-      timescale = 0;
-    }
-    console.log(timescale);
     requestAnimationFrame(loop);
 
     // Rotate clouds map
@@ -67,32 +63,34 @@ function animate(meshmap, controls, render, stats, world, scene, gui) {
           // Attach collision listener once
           if (!body.hasCollisionListener && sphere.userData.physicsBody) {
             body.addEventListener('collide', (event) => {
-              if (event.body === sphere.userData.physicsBody && !mesh.userData?.exploded) {
-                mesh.userData = mesh.userData || {};
-                mesh.userData.exploded = true;
+              // Only process collision with sphere
+              if (!event || !event.body || event.body !== sphere.userData.physicsBody) return;
+              if (mesh.userData?.exploded) return;
+              if (!event.contact) return;
 
-                const cp = new CANNON.Vec3();
-                event.contact.rj.vadd(event.body.position, cp);
-                let contactPoint = new THREE.Vector3(cp.x, cp.y, cp.z);
-                contactPoint = contactPoint.clone().sub(sphere.position).multiplyScalar(-1).add(sphere.position);
+              mesh.userData = mesh.userData || {};
+              mesh.userData.exploded = true;
 
-                // Create crater and explosion
-                deformEarth(sphere, clouds, contactPoint, 1, 1.5);
-                spawnExplosion(scene, contactPoint, 100);
-                explodeAsteroid(scene, mesh);
+              const cp = new CANNON.Vec3();
+              event.contact.ri.vadd(body.position, cp);
+              const contactPoint = new THREE.Vector3(cp.x, cp.y, cp.z);
 
-                // Queue the body for removal
-                if (mesh.userData.physicsBody) {
-                  bodiesToRemove.push(mesh.userData.physicsBody);
-                  mesh.userData.physicsBody = null;
-                }
+              // Create crater and explosion
+              deformEarth(sphere, clouds, contactPoint, 1, 1.5);
+              spawnExplosion(scene, contactPoint, 100);
+              explodeAsteroid(scene, mesh);
 
-                // Remove mesh from scene and meshmap
-                scene.remove(mesh);
-                if (Array.isArray(meshmap["asteroids"])) {
-                  const idx = meshmap["asteroids"].indexOf(mesh);
-                  if (idx > -1) meshmap["asteroids"].splice(idx, 1);
-                }
+              // Queue the body for removal
+              if (mesh.userData.physicsBody) {
+                bodiesToRemove.push(mesh.userData.physicsBody);
+                mesh.userData.physicsBody = null;
+              }
+
+              // Remove mesh from scene and meshmap
+              scene.remove(mesh);
+              if (Array.isArray(meshmap["asteroids"])) {
+                const idx = meshmap["asteroids"].indexOf(mesh);
+                if (idx > -1) meshmap["asteroids"].splice(idx, 1);
               }
             });
             body.hasCollisionListener = true;

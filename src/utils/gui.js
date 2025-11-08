@@ -33,6 +33,12 @@ function setupGUI() {
         toggleDisplay(timescaleContainer);
       };
     });
+      timerBtn.addEventListener('click', () => {
+      toggleDisplay(timescaleContainer)
+      if (isActive(asteroidContainer)) {
+        toggleDisplay(asteroidContainer);
+      };
+    });
 
     timescaleSlider.addEventListener('input', e => updateTimescale(e.target.value));
 

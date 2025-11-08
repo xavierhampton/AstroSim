@@ -11,10 +11,18 @@ function createStarfield(scene, count = 1000) {
   const positions = [];
 
   //Random Positions
+  const min_distance = 25
   for (let i = 0; i < count; i++) {
-    const x = (Math.random() - 0.5) * 200;
-    const y = (Math.random() - 0.5) * 200;
-    const z = (Math.random() - 0.5) * 200;
+    let distance = 0;
+    let x,y,z;
+    while (distance < min_distance) {
+        x = (Math.random() - 0.5) * 200;
+        y = (Math.random() - 0.5) * 200;
+        z = (Math.random() - 0.5) * 200;
+        distance = Math.sqrt(x ** 2 + y ** 2 + z ** 2)
+    }
+
+    
     positions.push(x, y, z);
   }
 

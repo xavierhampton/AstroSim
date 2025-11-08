@@ -1,6 +1,7 @@
 import * as CANNON from 'cannon-es';
+import * as THREE from 'three'
 
-function animate(meshmap, controls, render, stats, world, camera) {
+function animate(meshmap, controls, render, stats, world, scene) {
   const sphere = meshmap["sphere"];
   const clouds = meshmap["clouds"];
   const speed = 0.00001;
@@ -46,17 +47,36 @@ function animate(meshmap, controls, render, stats, world, camera) {
       if (Array.isArray(entry)) {
         entry.forEach((mesh) => {
           const body = mesh.userData?.physicsBody;
-          if (body) {
-            mesh.position.copy(body.position);
-            mesh.quaternion.copy(body.quaternion);
-          }
+          if (!body) return;
+
+          mesh.position.copy(body.position);
+          mesh.quaternion.copy(body.quaternion);
+
+          // Attach collision listener once
+          if (!body.hasCollisionListener && sphere.userData.physicsBody) {
+  body.addEventListener('collide', (event) => {
+    if (event.body === sphere.userData.physicsBody) {
+      // Compute collision point in world coordinates
+      const cp = new CANNON.Vec3();
+      event.contact.rj.vadd(event.body.position, cp);
+      const contactPoint = new THREE.Vector3(cp.x, cp.y, cp.z);
+
+      // Create one big crater
+      deformEarth(sphere, contactPoint, 2, 1.5); // increase radius & strength for bigger crater
+      spawnExplosion(scene, contactPoint, 100);
+
+
+    }
+  });
+  body.hasCollisionListener = true;
+}
+
         });
       } else {
         const body = entry.userData?.physicsBody;
-        if (body) {
-          entry.position.copy(body.position);
-          entry.quaternion.copy(body.quaternion);
-        }
+        if (!body) return;
+        entry.position.copy(body.position);
+        entry.quaternion.copy(body.quaternion);
       }
     });
 
@@ -96,4 +116,3 @@ function applyNBodyGravity(bodies, G = 1) {
   }
 }
 
-export { animate };

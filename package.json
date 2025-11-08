@@ -22,6 +22,7 @@
   },
   "homepage": "https://github.com/Sean-Bradley/Threejs-Boilerplate#readme",
   "dependencies": {
+    "cannon-es": "^0.20.0",
     "express": "^4.18.2",
     "simplex-noise": "^4.0.3",
     "three": "^0.157.0"

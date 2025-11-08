@@ -77,7 +77,7 @@ function animate(meshmap, controls, render, stats, world, scene, gui) {
                 contactPoint = contactPoint.clone().sub(sphere.position).multiplyScalar(-1).add(sphere.position);
 
                 // Create crater and explosion
-                deformEarth(sphere, clouds, contactPoint, 2, 1.5);
+                deformEarth(sphere, clouds, contactPoint, 1, 1.5);
                 spawnExplosion(scene, contactPoint, 100);
                 explodeAsteroid(scene, mesh);
 

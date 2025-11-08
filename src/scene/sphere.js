@@ -60,7 +60,7 @@ function createSphere() {
   earth.receiveShadow = true;
 
   //Add to physics sim
-  addPhysics(earth, world, { shapeType: 'sphere', mass: 20, radius: 3 });
+  addPhysics(earth, world, { shapeType: 'sphere', mass: 200, radius: 3 });
   return earth;
 }
 

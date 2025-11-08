@@ -9,6 +9,7 @@ function createSphere() {
 
   const textureLoader = new THREE.TextureLoader();
   const earthTexture = textureLoader.load('./resources/earth.jpg'); 
+  const stoneTexture = textureLoader.load('./resources/stone.jpg')
     
   const material = new THREE.MeshStandardMaterial({
     map: earthTexture,
@@ -37,6 +38,7 @@ function createSphere() {
   core.scale.multiplyScalar(0.4);
 
   const stoneMaterial = new THREE.MeshStandardMaterial({
+    map: stoneTexture,
     color: 0x777777,
     roughness: 1.0,
     metalness: 0.0,

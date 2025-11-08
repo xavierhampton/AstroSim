@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { setupSkybox } from './skybox.js';
 
 const scene = new THREE.Scene();
 
@@ -12,6 +13,8 @@ camera.position.z = 2;
 
 const renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
+setupSkybox(scene);
+
 document.body.appendChild(renderer.domElement);
 
 export { scene, camera, renderer };

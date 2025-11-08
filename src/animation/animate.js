@@ -71,9 +71,23 @@ function animate(meshmap, controls, render, stats, world, scene, gui) {
               mesh.userData = mesh.userData || {};
               mesh.userData.exploded = true;
 
-              const cp = new CANNON.Vec3();
-              event.contact.ri.vadd(body.position, cp);
-              const contactPoint = new THREE.Vector3(cp.x, cp.y, cp.z);
+              // Get the asteroid's position at impact
+              const asteroidPos = new THREE.Vector3(
+                body.position.x,
+                body.position.y,
+                body.position.z
+              );
+
+              // Get Earth's center
+              const earthCenter = sphere.position.clone();
+              const earthRadius = 3; // Match the radius from sphere.js
+
+              // Calculate impact point: project asteroid position onto Earth's surface
+              // Direction from Earth center to asteroid
+              const directionToAsteroid = asteroidPos.clone().sub(earthCenter).normalize();
+
+              // Contact point is on Earth's surface in that direction
+              const contactPoint = earthCenter.clone().add(directionToAsteroid.multiplyScalar(earthRadius));
 
               // Create crater and explosion
               deformEarth(sphere, clouds, contactPoint, 1, 1.5);

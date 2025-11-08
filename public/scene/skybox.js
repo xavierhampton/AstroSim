@@ -1,17 +1,40 @@
 import * as THREE from "three"
 
 
-  function setupSkybox(scene) {
-  const loader = new THREE.CubeTextureLoader();
-  const texture = loader.load([
-    '../resources/skybox/sky_right1.png',
-    '../resources/skybox/sky_left2.png',
-    '../resources/skybox/sky_top3.png',
-    '../resources/skybox/sky_bottom4.png',
-    '../resources/skybox/sky_front5.png',
-    '../resources/skybox/sky_back6.png',
-  ]);
-  scene.background = texture;
+function setupSkybox(scene) {
+    createStarfield(scene)
 }
+
+//Uses THREE points system to make cool stars that feel real
+function createStarfield(scene, count = 1000) {
+  const starsGeometry = new THREE.BufferGeometry();
+  const positions = [];
+
+  //Random Positions
+  for (let i = 0; i < count; i++) {
+    const x = (Math.random() - 0.5) * 200;
+    const y = (Math.random() - 0.5) * 200;
+    const z = (Math.random() - 0.5) * 200;
+    positions.push(x, y, z);
+  }
+
+  //Applies positions to the starfield
+  starsGeometry.setAttribute(
+    "position",
+    new THREE.Float32BufferAttribute(positions, 3)
+  );
+
+  //Material for stars, opacity to make it non-obtrusive
+  const starsMaterial = new THREE.PointsMaterial({
+    color: 0xffffff,
+    size: 0.5,
+    transparent: true,
+    opacity: 0.8,
+  });
+  
+  const starField = new THREE.Points(starsGeometry, starsMaterial);
+  scene.add(starField);
+}
+
 
 export { setupSkybox };

@@ -6,6 +6,8 @@ import { setupStats } from './utils/stats.js';
 import { setupGUI } from './utils/gui.js';
 import { animate } from './animation/animate.js';
 import { createClouds } from './scene/clouds.js';
+import { createAsteroid, spawnAsteroid } from './scene/asteroid.js';
+
 
 
 const meshmap = {};
@@ -26,6 +28,15 @@ Object.values(meshmap).forEach((mesh) => {
 const controls = createControls(camera, renderer);
 const stats = setupStats();
 const gui = setupGUI();
+
+window.addEventListener("click", (e) => {
+  if (gui.getCurrentMode() != "asteroid") {
+    return;
+  }
+
+  const asteroid = createAsteroid(3);
+  spawnAsteroid(asteroid, e, camera, world, scene, asteroids);
+});
 
 function render() {
   renderer.render(scene, camera);

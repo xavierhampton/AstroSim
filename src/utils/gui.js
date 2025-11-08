@@ -1,6 +1,6 @@
 import { GUI } from 'three/examples/jsm/libs/lil-gui.module.min.js';
 
-function setupGUI(camera) {
+function setupGUI() {
     // --- Existing lil-gui for camera ---
     // const gui = new GUI();
     // const cameraFolder = gui.addFolder('Camera');

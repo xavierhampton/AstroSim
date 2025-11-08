@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import SimplexNoise from "https://cdn.skypack.dev/simplex-noise@3.0.0?dts";
+import { addPhysics } from './physicsSetup';
 
 const noise = new SimplexNoise();
 function createAsteroid(baseRadius = 1) {
@@ -61,4 +62,15 @@ function createAsteroid(baseRadius = 1) {
   return asteroid;
 }
 
-export { createAsteroid };
+
+function spawnAsteroid(asteroid, position, world, scene) {
+  asteroid.position.set(
+    position['x'],
+    position['y'],
+    position['z']
+  );
+  scene.add(asteroid);
+  addPhysics(asteroid, world, { shapeType: 'custom', mass: 1, radius: 1 });
+}
+
+export { createAsteroid, spawnAsteroid };

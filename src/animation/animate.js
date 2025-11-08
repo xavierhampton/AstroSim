@@ -22,7 +22,8 @@ function animate(meshmap, controls, render, stats, world, scene) {
     // clouds.rotation.y += 20 * speed;
 
     if (clouds.material.map) {
-      clouds.material.map.offset.x -= 0.2 * xspeed * speed;
+      console.log("cloud pos" + clouds.material.map.offset.x);
+      clouds.material.map.offset.x -= 0.3 * xspeed * speed;
     }
 
     // Gather all physics bodies

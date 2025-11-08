@@ -1,4 +1,4 @@
-function animate(meshmap, controls, render, stats) {
+function animate(meshmap, controls, render, stats, world) {
   const sphere = meshmap["sphere"];
   const clouds = meshmap["clouds"];
   const speed = 0.00001;
@@ -16,27 +16,27 @@ function animate(meshmap, controls, render, stats) {
 
 
 
-    // world.step(1 / 60);
+    world.step(1 / 60);
 
-// Object.values(meshmap).forEach((entry) => {
-//   if (Array.isArray(entry)) {
-//     // If it's an array (like asteroids), sync each one
-//     entry.forEach((mesh) => {
-//       const body = mesh.userData?.physicsBody;
-//       if (body) {
-//         mesh.position.copy(body.position);
-//         mesh.quaternion.copy(body.quaternion);
-//       }
-//     });
-//   } else {
-//     // Normal single mesh (sphere, clouds, etc.)
-//     const body = entry.userData?.physicsBody;
-//     if (body) {
-//       entry.position.copy(body.position);
-//       entry.quaternion.copy(body.quaternion);
-//     }
-//   }
-//   });
+Object.values(meshmap).forEach((entry) => {
+  if (Array.isArray(entry)) {
+    // If it's an array (like asteroids), sync each one
+    entry.forEach((mesh) => {
+      const body = mesh.userData?.physicsBody;
+      if (body) {
+        mesh.position.copy(body.position);
+        mesh.quaternion.copy(body.quaternion);
+      }
+    });
+  } else {
+    // Normal single mesh (sphere, clouds, etc.)
+    const body = entry.userData?.physicsBody;
+    if (body) {
+      entry.position.copy(body.position);
+      entry.quaternion.copy(body.quaternion);
+    }
+  }
+  });
 
     controls.update();
     render();

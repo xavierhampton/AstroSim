@@ -1,5 +1,4 @@
-import { addPhysics, setupPhysics, world } from './scene/physicsSetup.js';
-import { scene, camera, renderer } from './scene/sceneSetup.js';
+import { scene, camera, renderer, world, asteroids } from './scene/sceneSetup.js';
 import { createSphere } from './scene/sphere.js';
 import { createControls } from './scene/controls.js';
 import { handleResize } from './utils/resizeHandler.js';
@@ -8,9 +7,9 @@ import { setupGUI } from './utils/gui.js';
 import { animate } from './animation/animate.js';
 import { createClouds } from './scene/clouds.js';
 
-setupPhysics()
+
 const meshmap = {};
-meshmap['asteroids'] = []
+meshmap['asteroids'] = asteroids
 
 
 const sphere = createSphere();
@@ -32,4 +31,4 @@ function render() {
 }
 
 handleResize(camera, renderer, render);
-animate(meshmap, controls, render, stats);
+animate(meshmap, controls, render, stats, world);

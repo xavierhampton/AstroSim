@@ -1,9 +1,10 @@
 import * as THREE from 'three';
 import { setupSkybox } from './skybox.js';
 import { createAsteroid } from './asteroid.js';
-import { addPhysics, world } from './physicsSetup.js';
+import {setupPhysics, addPhysics} from './physicsSetup.js';
 
 
+const world = setupPhysics();
 const scene = new THREE.Scene();
 
 const camera = new THREE.PerspectiveCamera(
@@ -28,23 +29,23 @@ const ambient = new THREE.AmbientLight(0xffffff, 0.4);
 scene.add(ambient);
 
 
-//SPAWNS N ASTEROIDS, TEMPORARY
-// const asteroids = []
-// for (let i = 0; i < 1; i++) {
-//   const asteroid = createAsteroid(
-//     0.5 + Math.random() * 3 // radius
-//   );
-//   asteroid.position.set(
-//     (Math.random() - 0.5) * 30,
-//     (Math.random() - 0.5) * 30,
-//     (Math.random() - 0.5) * 30
-//   );
-//   scene.add(asteroid);
-//   addPhysics(asteroid, world, { shapeType: 'sphere', mass: 1, radius: 1 });
-//   asteroids.push(asteroid);
-// }
+// SPAWNS N ASTEROIDS, TEMPORARY
+const asteroids = []
+for (let i = 0; i < 1; i++) {
+  const asteroid = createAsteroid(
+    0.5 + Math.random() * 3 // radius
+  );
+  asteroid.position.set(
+    (Math.random() - 0.5) * 30,
+    (Math.random() - 0.5) * 30,
+    (Math.random() - 0.5) * 30
+  );
+  scene.add(asteroid);
+  addPhysics(asteroid, world, { shapeType: 'sphere', mass: 1, radius: 1 });
+  asteroids.push(asteroid);
+}
 
 
 document.body.appendChild(renderer.domElement);
 
-export { scene, camera, renderer};
+export { scene, camera, renderer, world, asteroids};

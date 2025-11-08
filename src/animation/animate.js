@@ -4,16 +4,17 @@ import { applyNBodyGravity, spawnExplosion, deformEarth, explodeAsteroid } from 
 
 let clouds;
 let sphere;
-function animate(meshmap, controls, render, stats, world, scene) {
+function animate(meshmap, controls, render, stats, world, scene, gui) {
   sphere = meshmap["sphere"];
   clouds = meshmap["clouds"];
   const speed = 0.00001;
   const xspeed = 6;
-
+  
   // N-body gravity constant
   const G = 5;
-
+  
   function loop() {
+    let timescale = gui.getTimescale();
     requestAnimationFrame(loop);
     // // Rotate sphere & clouds
     // sphere.rotation.x += xspeed * speed;
@@ -22,8 +23,8 @@ function animate(meshmap, controls, render, stats, world, scene) {
     // clouds.rotation.y += 20 * speed;
 
     if (clouds.material.map) {
-      console.log("cloud pos" + clouds.material.map.offset.x);
-      clouds.material.map.offset.x -= 0.3 * xspeed * speed;
+      // console.log("cloud pos" + clouds.material.map.offset.x);
+      clouds.material.map.offset.x -= 0.3 * xspeed * speed * timescale;
     }
 
     // Gather all physics bodies
@@ -42,7 +43,7 @@ function animate(meshmap, controls, render, stats, world, scene) {
     applyNBodyGravity(bodies, G);
 
     // Step the physics world
-    world.step(1 / 60);
+    world.step((1 / 60) * timescale);
 
     // Sync mesh positions & rotations with physics bodies
     Object.values(meshmap).forEach((entry) => {

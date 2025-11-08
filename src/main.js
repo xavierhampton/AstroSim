@@ -32,4 +32,4 @@ function render() {
 }
 
 handleResize(camera, renderer, render);
-animate(meshmap, controls, render, stats, world, scene);
+animate(meshmap, controls, render, stats, world, scene, gui);

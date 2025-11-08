@@ -41,7 +41,7 @@ for (let i = 0; i < 1; i++) {
     (Math.random() - 0.5) * 30
   );
   scene.add(asteroid);
-  addPhysics(asteroid, world, { shapeType: 'sphere', mass: 1, radius: 1 });
+  addPhysics(asteroid, world, { shapeType: 'custom', mass: 1, radius: 1 });
   asteroids.push(asteroid);
 }
 

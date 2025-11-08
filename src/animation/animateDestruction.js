@@ -50,8 +50,8 @@ function deformEarth(earthMesh, clouds, collisionPoint, radius = 0.5, strength =
         let push = (1 - dist / radius) * strength;
 
         // Add subtle noise factor to make rock look jagged and tougher
-        const noise = simplex.noise3D(tempVec.x * 0.5, tempVec.y * 0.5, tempVec.z * 0.5);
-        const noiseFactor = 1.0 + noise * 0.2; // ±20% variance
+        const noise = simplex.noise3D(tempVec.x * 3, tempVec.y * 3, tempVec.z * 3);
+        const noiseFactor = 1.0 + noise * 0.5; // ±20% variance
 
         // Different toughness based on layer
         if (mesh === earthMesh.children[1]) {

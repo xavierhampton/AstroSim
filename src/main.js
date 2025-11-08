@@ -24,7 +24,7 @@ Object.values(meshmap).forEach((mesh) => {
 
 const controls = createControls(camera, renderer);
 const stats = setupStats();
-setupGUI(camera);
+const gui = setupGUI();
 
 function render() {
   renderer.render(scene, camera);

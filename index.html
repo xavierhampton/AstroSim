@@ -9,6 +9,65 @@
                 overflow: hidden;
                 margin: 0px;
             }
+            /* UI container */
+            .ui-container {
+                position: absolute;
+                top: 20px;
+                right: 20px;        /* move from left to right */
+                display: flex;
+                flex-direction: column; /* stack buttons vertically */
+                gap: 10px;          /* space between buttons */
+                z-index: 10;
+                align-items: flex-end; /* align buttons to the right edge */
+            }
+
+            /* Buttons */
+            .mode-btn {
+                background: rgba(255,255,255,0.1);
+                border: 1px solid #aaa;
+                border-radius: 8px;
+                padding: 8px 12px;
+                aspect-ratio: 1/1;
+                cursor: pointer;
+                transition: 0.2s;
+                display: flex;
+                align-items: center;
+                gap: 5px;
+                color: white;
+                font-family: sans-serif;
+                font-size: 20px;
+                width: 55px;
+                justify-content: center;
+            }
+
+            .mode-btn.active {
+                background: rgba(100, 200, 255, 0.3);
+                border-color: #4af;
+            }
+
+            /* Timescale slider container */
+            .timescale-container {
+                display: none;             /* hidden by default */
+                position: absolute;        /* absolute relative to wrapper */
+                right: 100%;               /* position to the left of the button */
+                top: 0;                    /* align top edges */
+                flex-direction: column;
+                background: rgba(50,50,50,0.8);
+                padding: 8px;
+                border-radius: 6px;
+                margin-right: 5px;         /* small gap between button and popup */
+            }
+
+            .timescale-container input[type="range"] {
+                accent-color: #4af;
+                width: 120px;
+            }
+            .timescale-container label {
+                color: white;
+                font-size: 12px;
+                margin-bottom: 4px;
+                font-family: sans-serif;
+            }
         </style>
 
         <!-- Import maps polyfill -->
@@ -28,6 +87,19 @@
     </head>
 
     <body>
+        <div class="ui-container">
+            <button id="viewBtn" class="mode-btn active">👋</button>
+            <button id="asteroidBtn" class="mode-btn">☄️</button>
+            <div style="position: relative; display: flex; align-items: center;">
+                <button id="timerBtn" class="mode-btn">⏱</button>
+                <div id="timescaleContainer" class="timescale-container">
+                    <label for="timescaleSlider">Timescale</label>
+                    <input type="range" id="timescaleSlider" min="0.0" max="10" step="0.1" value="1">
+                    <input type="number" id="timescaleNumber" min="0.0" max="10" step="0.1" value="1" style="margin-top:4px;">
+                </div>
+            </div>
+        </div>
+
         <script type="module" src="/src/main.js"></script>
     </body>
 </html>

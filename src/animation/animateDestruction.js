@@ -3,13 +3,13 @@ import * as THREE from 'three'
 
 //N -body gravity function
 function applyNBodyGravity(bodies, G = 1) {
-  for (let i = 0; i < bodies.length; i++) {
-    const bi = bodies[i];
-    if (bi.mass === 0) continue;
+  // Filter out null or undefined bodies
+  const validBodies = bodies.filter(b => b && b.mass !== 0);
 
-    for (let j = i + 1; j < bodies.length; j++) {
-      const bj = bodies[j];
-      if (bj.mass === 0) continue;
+  for (let i = 0; i < validBodies.length; i++) {
+    const bi = validBodies[i];
+    for (let j = i + 1; j < validBodies.length; j++) {
+      const bj = validBodies[j];
 
       const rVec = new CANNON.Vec3();
       bj.position.vsub(bi.position, rVec);
@@ -25,6 +25,7 @@ function applyNBodyGravity(bodies, G = 1) {
     }
   }
 }
+
 
 function deformEarth(earthMesh, clouds, collisionPoint, radius = 1, strength = 0.5) {
   // Convert collision point to local space of the sphere
@@ -112,4 +113,61 @@ function spawnExplosion(scene, position, numParticles = 50) {
   explode();
 }
 
-export { applyNBodyGravity, spawnExplosion, deformEarth };
+
+function explodeAsteroid(scene, asteroidMesh, numPieces = 20, force = 0.5) {
+
+  const asteroidWorldPos = new THREE.Vector3();
+  asteroidMesh.getWorldPosition(asteroidWorldPos);
+
+  for (let i = 0; i < numPieces; i++) {
+    // Create a small shard
+    const shardRadius = 0.1 + Math.random() * 0.2;
+    const shardGeometry = new THREE.SphereGeometry(shardRadius, 4, 4);
+
+    const material = new THREE.MeshStandardMaterial({
+      color: 0x888888,
+      roughness: 1,
+      metalness: 0,
+    });
+
+    const shard = new THREE.Mesh(shardGeometry, material);
+
+    // Position shards randomly around the asteroid
+    shard.position.copy(asteroidWorldPos);
+    shard.position.x += (Math.random() - 0.5) * 0.5;
+    shard.position.y += (Math.random() - 0.5) * 0.5;
+    shard.position.z += (Math.random() - 0.5) * 0.5;
+
+    shard.castShadow = true;
+    shard.receiveShadow = true;
+
+    scene.add(shard);
+
+    // Random velocity
+    const velocity = new THREE.Vector3(
+      (Math.random() - 0.5) * force,
+      (Math.random() - 0.5) * force,
+      (Math.random() - 0.5) * force
+    );
+
+    // Animate shard
+    let t = 0;
+    const lifespan = 100;
+    function moveShard() {
+      t++;
+      shard.position.add(velocity);
+      shard.rotation.x += Math.random() * 0.1;
+      shard.rotation.y += Math.random() * 0.1;
+      shard.rotation.z += Math.random() * 0.1;
+
+      if (t < lifespan) requestAnimationFrame(moveShard);
+      else scene.remove(shard);
+    }
+    moveShard();
+  }
+}
+
+
+
+
+export { applyNBodyGravity, spawnExplosion, deformEarth, explodeAsteroid };

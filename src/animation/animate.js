@@ -1,6 +1,6 @@
 import * as CANNON from 'cannon-es';
 import * as THREE from 'three'
-import { applyNBodyGravity, spawnExplosion, deformEarth } from "./animateDestruction.js"
+import { applyNBodyGravity, spawnExplosion, deformEarth, explodeAsteroid } from "./animateDestruction.js"
 
 let clouds;
 let sphere;
@@ -69,7 +69,21 @@ function animate(meshmap, controls, render, stats, world, scene) {
                 // Create one big crater on the opposite side
                 deformEarth(sphere, clouds, contactPoint, 2, 1.5);
                 spawnExplosion(scene, contactPoint, 100);
+                explodeAsteroid(scene, mesh); // 'mesh' is the colliding asteroid
+
+
+
+                //Remove from world
+                scene.remove(mesh);
+
+                //Remove From MeshMap 
+                if (Array.isArray(meshmap["asteroids"])) {
+                    const idx = meshmap["asteroids"].indexOf(mesh);
+                    if (idx > -1) meshmap["asteroids"].splice(idx, 1);
+                  }
               }
+                
+                world.removeBody(event.body);
             });
             body.hasCollisionListener = true;
           }

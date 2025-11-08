@@ -1,16 +1,17 @@
 import * as CANNON from 'cannon-es';
 
-function animate(meshmap, controls, render, stats, world) {
+function animate(meshmap, controls, render, stats, world, camera) {
   const sphere = meshmap["sphere"];
   const clouds = meshmap["clouds"];
   const speed = 0.00001;
   const xspeed = 6;
 
   // N-body gravity constant
-  const G = 5; // tweak for stronger/weaker gravity
+  const G = 5;
 
   function loop() {
     requestAnimationFrame(loop);
+
 
     // Rotate sphere & clouds
     sphere.rotation.x += xspeed * speed;
@@ -61,6 +62,7 @@ function animate(meshmap, controls, render, stats, world) {
 
     clouds.position.copy(sphere.position);
     // Update controls, render, stats
+    controls.target.copy(sphere.position); 
     controls.update();
     render();
     stats.update();

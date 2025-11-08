@@ -1,4 +1,6 @@
 import * as THREE from 'three';
+import { addPhysics, setupPhysics, world } from './physicsSetup.js';
+
 
 function createSphere() {
   const radius = 3;
@@ -6,7 +8,7 @@ function createSphere() {
   const geometry = new THREE.SphereGeometry(radius, segments, segments);
 
   const textureLoader = new THREE.TextureLoader();
-  const earthTexture = textureLoader.load('../resources/earth.jpg'); 
+  const earthTexture = textureLoader.load('./resources/earth.jpg'); 
     
   const material = new THREE.MeshStandardMaterial({
     map: earthTexture,
@@ -31,6 +33,8 @@ function createSphere() {
   earth.castShadow = true;
   earth.receiveShadow = true;
 
+  //Add to physics sim
+  addPhysics(earth, world, { shapeType: 'sphere', mass: 0, radius: 3 });
   return earth;
 }
 

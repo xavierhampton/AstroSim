@@ -21,7 +21,7 @@ function createAsteroid(baseRadius = 1) {
 
   // Load texture
   const textureLoader = new THREE.TextureLoader();
-  const texture = textureLoader.load('../resources/asteroid_texture.jpg');
+  const texture = textureLoader.load('./resources/asteroid_texture.jpg');
 
   // Base asteroid mesh
   const material = new THREE.MeshStandardMaterial({

@@ -1,3 +1,4 @@
+import { addPhysics, setupPhysics, world } from './scene/physicsSetup.js';
 import { scene, camera, renderer } from './scene/sceneSetup.js';
 import { createSphere } from './scene/sphere.js';
 import { createControls } from './scene/controls.js';
@@ -7,14 +8,19 @@ import { setupGUI } from './utils/gui.js';
 import { animate } from './animation/animate.js';
 import { createClouds } from './scene/clouds.js';
 
+setupPhysics()
 const meshmap = {};
+meshmap['asteroids'] = []
+
 
 const sphere = createSphere();
 meshmap["sphere"] = sphere;
 const clouds = createClouds();
 meshmap["clouds"] = clouds;
 Object.values(meshmap).forEach((mesh) => {
+  if (!Array.isArray(mesh)) {
     scene.add(mesh);
+  }
 });
 
 const controls = createControls(camera, renderer);

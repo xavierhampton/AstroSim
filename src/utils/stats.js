@@ -1,4 +1,4 @@
-import Stats from '../jsm/libs/stats.module.js';
+import Stats from 'three/examples/jsm/libs/stats.module.js';
 
 function setupStats() {
   const stats = Stats();

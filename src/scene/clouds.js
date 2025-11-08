@@ -6,7 +6,7 @@ function createClouds() {
     const geometry = new THREE.SphereGeometry(radius, segments, segments);
   
     const textureLoader = new THREE.TextureLoader();
-    const texture = textureLoader.load('../resources/cloud_texture.png');
+    const texture = textureLoader.load('./resources/cloud_texture.png');
 
     texture.wrapS = THREE.RepeatWrapping;
     texture.wrapT = THREE.RepeatWrapping;

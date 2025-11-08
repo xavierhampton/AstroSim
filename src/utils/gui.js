@@ -1,5 +1,4 @@
-import { GUI } from '../jsm/libs/lil-gui.module.min.js';
-
+import { GUI } from 'three/examples/jsm/libs/lil-gui.module.min.js';
 function setupGUI(camera) {
   const gui = new GUI();
 

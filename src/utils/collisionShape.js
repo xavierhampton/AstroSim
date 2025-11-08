@@ -2,7 +2,7 @@ import * as CANNON from 'cannon-es';
 import * as THREE from 'three';
 
 function createCannonShapeFromMesh(mesh) {
-  const geometry = mesh.geometry.clone();
+  let geometry = mesh.geometry.clone();
   geometry.computeBoundingBox();
   geometry.computeVertexNormals();
   geometry = new THREE.BufferGeometry().fromGeometry(geometry); // ensure it's a BufferGeometry

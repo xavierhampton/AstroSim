@@ -63,21 +63,13 @@ function createAsteroid(baseRadius = 1) {
 }
 
 
-function spawnAsteroid(asteroid, event, camera, world, scene, asteroids) {
-  // --- Convert mouse click to normalized device coordinates ---
-  const mouse = new THREE.Vector2(
-    (event.clientX / window.innerWidth) * 2 - 1,
-    -(event.clientY / window.innerHeight) * 2 + 1
-  );
-
-  // --- Create ray from camera through mouse ---
-  const raycaster = new THREE.Raycaster();
-  raycaster.setFromCamera(mouse, camera);
-
+function spawnAsteroid(asteroid, camera, world, scene, asteroids) {
   // --- Define spawn point some units in front of camera ---
-  const planeDistance = 10; // adjust as needed
+  const planeDistance = 10; // distance in front of camera
   const spawnPoint = new THREE.Vector3();
-  spawnPoint.copy(raycaster.ray.origin).add(raycaster.ray.direction.multiplyScalar(planeDistance));
+  camera.getWorldDirection(spawnPoint); // spawnPoint temporarily holds direction
+  spawnPoint.multiplyScalar(planeDistance); 
+  spawnPoint.add(camera.position); // move it in front of camera
 
   // --- Position asteroid ---
   asteroid.position.copy(spawnPoint);
@@ -87,11 +79,12 @@ function spawnAsteroid(asteroid, event, camera, world, scene, asteroids) {
   const speed = 10; // adjust as needed
   const velocity = new THREE.Vector3();
   camera.getWorldDirection(velocity).multiplyScalar(speed);
-  asteroid.userData.velocity = velocity; // optional if you want to track manually
+  asteroid.userData.velocity = velocity;
 
   // --- Add physics ---
   addPhysics(asteroid, world, { shapeType: 'custom', mass: 1, radius: 1 });
 
+  // --- Track asteroid ---
   asteroids.push(asteroid);
 }
 

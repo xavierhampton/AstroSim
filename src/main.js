@@ -13,6 +13,10 @@ import { createAsteroid, spawnAsteroid } from './scene/asteroid.js';
 const meshmap = {};
 meshmap['asteroids'] = asteroids
 
+const launchButton = document.getElementById('launchAsteroid');
+const sizeInput = document.getElementById('asteroidSize');
+const massInput = document.getElementById('asteroidMass');
+
 
 const sphere = createSphere();
 meshmap["sphere"] = sphere;
@@ -29,13 +33,22 @@ const controls = createControls(camera, renderer);
 const stats = setupStats();
 const gui = setupGUI();
 
-window.addEventListener("click", (e) => {
-  if (gui.getCurrentMode() != "asteroid") {
-    return;
-  }
+// Launch asteroid button
+launchButton.addEventListener('click', () => {
+    const size = parseFloat(sizeInput.value) || 1;
+    const mass = parseFloat(massInput.value) || 1;
 
-  const asteroid = createAsteroid(3);
-  spawnAsteroid(asteroid, e, camera, world, scene, asteroids);
+    // Create asteroid with chosen size
+    const asteroid = createAsteroid(size);
+
+    // Adjust physics mass if needed
+    const physicsOptions = { shapeType: 'custom', mass: mass, radius: 1 };
+
+    // Spawn asteroid in front of camera and add to scene
+    spawnAsteroid(asteroid, camera, world, scene, asteroids);
+
+    // Update physics mass after spawn if your physics library allows
+    if (asteroid.body) asteroid.body.mass = mass; // example if using Cannon.js or Ammo.js
 });
 
 function render() {

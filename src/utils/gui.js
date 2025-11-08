@@ -1,76 +1,54 @@
-import { GUI } from 'three/examples/jsm/libs/lil-gui.module.min.js';
+function isActive(element) {
+  return element.style.display !== 'none' && element.offsetParent !== null;
+}
+
 
 function setupGUI() {
-    // --- Existing lil-gui for camera ---
-    // const gui = new GUI();
-    // const cameraFolder = gui.addFolder('Camera');
-    // cameraFolder.add(camera.position, 'z', 0, 10);
-    // cameraFolder.open();
-
-    // --- New DOM-based buttons and timescale ---
-    const viewBtn = document.getElementById('viewBtn');
+    // --- DOM Elements ---
     const asteroidBtn = document.getElementById('asteroidBtn');
     const timerBtn = document.getElementById('timerBtn');
+    const asteroidContainer = document.getElementById('asteroidContainer');
     const timescaleContainer = document.getElementById('timescaleContainer');
     const timescaleSlider = document.getElementById('timescaleSlider');
-    const timescaleNumber = document.getElementById("timescaleNumber");
+    const timescaleNumber = document.getElementById('timescaleNumber');
 
-    function updateTime(val) {
-      if (val > 10) {
-        val = 10;
-      }
-      if (val < 0) {
-        val = 0;
-      }
-      timescaleSlider.value = val;
-      timescaleNumber.value = val;
-
-      return val;
-    }
-
-    let currentMode = 'view';
+    // --- State ---
     let timescale = parseFloat(timescaleSlider.value);
 
-    viewBtn.addEventListener('click', () => setMode('view'));
-    asteroidBtn.addEventListener('click', () => setMode('asteroid'));
-    timerBtn.addEventListener('click', () => {
-        timescaleContainer.style.display =
-            timescaleContainer.style.display === 'flex' ? 'none' : 'flex';
-    });
-    timescaleSlider.addEventListener('input', e => {
-      timescale = parseFloat(e.target.value);
-      timescaleNumber.value = timescale;
+    // --- Helper Functions ---
+    const toggleDisplay = element => {
+        element.style.display = element.style.display === 'flex' ? 'none' : 'flex';
+    };
+
+    const updateTimescale = value => {
+        timescale = parseFloat(value);
+        timescaleSlider.value = timescale;
+        timescaleNumber.value = timescale;
+    };
+
+    // --- Event Listeners ---
+    asteroidBtn.addEventListener('click', () => {
+      toggleDisplay(asteroidContainer)
+      if (isActive(timescaleContainer)) {
+        toggleDisplay(timescaleContainer);
+      };
     });
 
-    // When number input changes, update slider and state
+    timescaleSlider.addEventListener('input', e => updateTimescale(e.target.value));
+
     timescaleNumber.addEventListener('change', e => {
         let val = parseFloat(e.target.value);
+        if (isNaN(val)) return (timescaleNumber.value = timescale);
 
-        // Clamp the value to 0–10
-        if (!isNaN(val)) {
-            val = Math.min(Math.max(val, 0), 10);
-            timescale = val;
-
-            // Sync slider
-            timescaleSlider.value = val;
-            timescaleNumber.value = val;
-        } else {
-            // If user cleared input, revert to last valid value
-            timescaleNumber.value = timescale;
-        }
+        // Clamp between 0 and 10
+        val = Math.min(Math.max(val, 0), 10);
+        updateTimescale(val);
     });
 
-
-    function setMode(mode) {
-        currentMode = mode;
-        viewBtn.classList.toggle('active', mode === 'view');
-        asteroidBtn.classList.toggle('active', mode === 'asteroid');
-    }
-
-    // Return GUI object and state getters so main.js can use them
+    // --- Public API ---
     return {
         getCurrentMode: () => currentMode,
-        getTimescale: () => timescale
+        getTimescale: () => timescale,
     };
 }
 

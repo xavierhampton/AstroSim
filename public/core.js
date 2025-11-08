@@ -5,9 +5,17 @@ import { handleResize } from './utils/resizeHandler.js';
 import { setupStats } from './utils/stats.js';
 import { setupGUI } from './utils/gui.js';
 import { animate } from './animation/animate.js';
+import { createClouds } from './scene/clouds.js';
+
+const meshmap = {};
 
 const sphere = createSphere();
-scene.add(sphere);
+meshmap["sphere"] = sphere;
+const clouds = createClouds();
+meshmap["clouds"] = clouds;
+Object.values(meshmap).forEach((mesh) => {
+    scene.add(mesh);
+});
 
 const controls = createControls(camera, renderer);
 const stats = setupStats();
@@ -18,4 +26,4 @@ function render() {
 }
 
 handleResize(camera, renderer, render);
-animate(sphere, controls, render, stats);
+animate(meshmap, controls, render, stats);

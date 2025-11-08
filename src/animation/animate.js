@@ -1,9 +1,11 @@
 import * as CANNON from 'cannon-es';
 import * as THREE from 'three'
 
+let clouds;
+let sphere;
 function animate(meshmap, controls, render, stats, world, scene) {
-  const sphere = meshmap["sphere"];
-  const clouds = meshmap["clouds"];
+  sphere = meshmap["sphere"];
+  clouds = meshmap["clouds"];
   const speed = 0.00001;
   const xspeed = 6;
 
@@ -54,22 +56,25 @@ function animate(meshmap, controls, render, stats, world, scene) {
 
           // Attach collision listener once
           if (!body.hasCollisionListener && sphere.userData.physicsBody) {
-  body.addEventListener('collide', (event) => {
-    if (event.body === sphere.userData.physicsBody) {
-      // Compute collision point in world coordinates
-      const cp = new CANNON.Vec3();
-      event.contact.rj.vadd(event.body.position, cp);
-      const contactPoint = new THREE.Vector3(cp.x, cp.y, cp.z);
+            body.addEventListener('collide', (event) => {
+              if (event.body === sphere.userData.physicsBody) {
+                // Compute collision point in world coordinates
+                const cp = new CANNON.Vec3();
+                event.contact.rj.vadd(event.body.position, cp);
+                let contactPoint = new THREE.Vector3(cp.x, cp.y, cp.z);
 
-      // Create one big crater
-      deformEarth(sphere, contactPoint, 2, 1.5); // increase radius & strength for bigger crater
-      spawnExplosion(scene, contactPoint, 100);
+                // Mirror the collision point through the center of the sphere
+                const spherePos = sphere.position.clone();
+                contactPoint = contactPoint.clone().sub(spherePos).multiplyScalar(-1).add(spherePos);
 
+                // Create one big crater on the opposite side
+                deformEarth(sphere, contactPoint, 2, 1.5);
+                spawnExplosion(scene, contactPoint, 100);
+              }
+            });
+            body.hasCollisionListener = true;
+          }
 
-    }
-  });
-  body.hasCollisionListener = true;
-}
 
         });
       } else {
@@ -81,6 +86,7 @@ function animate(meshmap, controls, render, stats, world, scene) {
     });
 
     clouds.position.copy(sphere.position);
+    clouds.quaternion.copy(sphere.quaternion)
     // Update controls, render, stats
     controls.target.copy(sphere.position); 
     controls.update();
@@ -121,7 +127,7 @@ function deformEarth(earthMesh, collisionPoint, radius = 1, strength = 0.5) {
   const localCollision = collisionPoint.clone();
   earthMesh.worldToLocal(localCollision);
 
-  const meshesToDeform = [earthMesh];
+  const meshesToDeform = [earthMesh, clouds];
   // Add rim sphere if it exists
   if (earthMesh.children.length > 0) {
     meshesToDeform.push(earthMesh.children[0]);

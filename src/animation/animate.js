@@ -15,6 +15,10 @@ function animate(meshmap, controls, render, stats, world, scene, gui) {
   
   function loop() {
     let timescale = gui.getTimescale();
+    if (isNaN(timescale)) {
+      timescale = 0;
+    }
+    console.log(timescale);
     requestAnimationFrame(loop);
     // // Rotate sphere & clouds
     // sphere.rotation.x += xspeed * speed;

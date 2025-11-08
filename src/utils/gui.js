@@ -43,11 +43,23 @@ function setupGUI() {
     });
 
     // When number input changes, update slider and state
-    timescaleNumber.addEventListener('input', e => {
+    timescaleNumber.addEventListener('change', e => {
         let val = parseFloat(e.target.value);
-        val = updateTime(val);
-        timescale = val;
+
+        // Clamp the value to 0–10
+        if (!isNaN(val)) {
+            val = Math.min(Math.max(val, 0), 10);
+            timescale = val;
+
+            // Sync slider
+            timescaleSlider.value = val;
+            timescaleNumber.value = val;
+        } else {
+            // If user cleared input, revert to last valid value
+            timescaleNumber.value = timescale;
+        }
     });
+
 
     function setMode(mode) {
         currentMode = mode;

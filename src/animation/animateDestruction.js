@@ -1,6 +1,10 @@
 import * as CANNON from 'cannon-es';
 import * as THREE from 'three'
 
+import SimplexNoise from "https://cdn.skypack.dev/simplex-noise@3.0.0?dts";
+
+const simplex = new SimplexNoise();
+
 //N -body gravity function
 function applyNBodyGravity(bodies, G = 1) {
   // Filter out null or undefined bodies
@@ -27,36 +31,42 @@ function applyNBodyGravity(bodies, G = 1) {
 }
 
 
-function deformEarth(earthMesh, clouds, collisionPoint, radius = 1, strength = 0.5) {
-  // Convert collision point to local space of the sphere
+function deformEarth(earthMesh, clouds, collisionPoint, radius = 0.5, strength = 1) {
   const localCollision = collisionPoint.clone();
   earthMesh.worldToLocal(localCollision);
 
-  const meshesToDeform = [earthMesh, clouds];
-  // Add rim sphere if it exists
-  if (earthMesh.children.length > 0) {
-    meshesToDeform.push(earthMesh.children[0]);
-  }
+  const meshesToDeform = [earthMesh, clouds, ...earthMesh.children];
 
   const center = new THREE.Vector3(0, 0, 0);
   const tempVec = new THREE.Vector3();
 
-  meshesToDeform.forEach((mesh) => {
+  meshesToDeform.forEach((mesh, idx) => {
     const position = mesh.geometry.attributes.position;
 
     for (let i = 0; i < position.count; i++) {
       tempVec.fromBufferAttribute(position, i);
-
       const dist = tempVec.distanceTo(localCollision);
       if (dist < radius) {
-        const push = (1 - dist / radius) * strength;
+        let push = (1 - dist / radius) * strength;
 
-        // Radial direction from center to vertex
+        // Add subtle noise factor to make rock look jagged and tougher
+        const noise = simplex.noise3D(tempVec.x * 0.5, tempVec.y * 0.5, tempVec.z * 0.5);
+        const noiseFactor = 1.0 + noise * 0.2; // ±20% variance
+
+        // Different toughness based on layer
+        if (mesh === earthMesh.children[1]) {
+          // Stone layer: heavily reduced deformation, but rough
+          push *= 0.15 * noiseFactor;
+        } else if (mesh === earthMesh.children[2]) {
+          // Core: almost solid
+          push *= 0.1;
+        } else {
+          // Outer crust or clouds
+          push *= 1.0 * noiseFactor;
+        }
+
         const radialDir = tempVec.clone().sub(center).normalize();
-
-        // Move vertex inward to form crater
         tempVec.addScaledVector(radialDir, -push);
-
         position.setXYZ(i, tempVec.x, tempVec.y, tempVec.z);
       }
     }
@@ -121,7 +131,7 @@ function explodeAsteroid(scene, asteroidMesh, numPieces = 30, force = 0.5) {
 
   for (let i = 0; i < numPieces; i++) {
     // Create a small shard
-    const shardRadius = 0.2 + Math.random() * 0.2;
+    const shardRadius = 0.3 + Math.random() * 0.2;
     const shardGeometry = new THREE.SphereGeometry(shardRadius, 4, 4);
 
     const material = new THREE.MeshStandardMaterial({

@@ -23,12 +23,36 @@ function createSphere() {
     opacity: 0.4,
   });
 
+
+
+  const coreMaterial = new THREE.MeshStandardMaterial({
+    emissive: new THREE.Color(0xff6600), // orange glow
+    emissiveIntensity: 2,
+    color: 0x552200,
+    roughness: 0.3,
+    metalness: 0.8,
+  });
+
+  const core = new THREE.Mesh(geometry.clone(), coreMaterial);
+  core.scale.multiplyScalar(0.4);
+
+  const stoneMaterial = new THREE.MeshStandardMaterial({
+    color: 0x777777,
+    roughness: 1.0,
+    metalness: 0.0,
+  });
+  const stoneLayer = new THREE.Mesh(geometry.clone(), stoneMaterial);
+  stoneLayer.scale.multiplyScalar(0.97);
+
+
   //Make sphere slightly larger
   const rimSphere = new THREE.Mesh(geometry.clone(), rimMaterial);
   rimSphere.scale.multiplyScalar(1.02);
 
   const earth = new THREE.Mesh(geometry, material);
   earth.add(rimSphere);
+  earth.add(stoneLayer);
+  earth.add(core);
 
   earth.castShadow = true;
   earth.receiveShadow = true;

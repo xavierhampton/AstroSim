@@ -51,7 +51,7 @@ Object.values(meshmap).forEach((mesh) => {
 });
 
 const controls = createControls(camera, renderer);
-const stats = setupStats();
+// const stats = setupStats();
 const gui = setupGUI();
 
 let hologram = null;
@@ -115,4 +115,4 @@ function render() {
 }
 
 handleResize(camera, renderer, render);
-animate(meshmap, controls, render, stats, world, scene, gui, composer);
+animate(meshmap, controls, render, null, world, scene, gui, composer, camera);

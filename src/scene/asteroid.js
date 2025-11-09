@@ -63,7 +63,7 @@ function createAsteroid(baseRadius = 1) {
 }
 
 
-function spawnAsteroid(asteroid, position, world, scene, asteroids, mass, size) {
+function spawnAsteroid(asteroid, position, world, scene, asteroids, mass, size, velocity = null) {
   // --- Position asteroid ---
   asteroid.position.copy(position);
   scene.add(asteroid);
@@ -72,6 +72,11 @@ function spawnAsteroid(asteroid, position, world, scene, asteroids, mass, size) 
 
   // Reduce spinning by adding angular damping
   body.angularDamping = 0.8; // Higher = less spinning (0-1 range)
+
+  // Apply initial velocity if provided
+  if (velocity) {
+    body.velocity.set(velocity.x, velocity.y, velocity.z);
+  }
 
   // --- Track asteroid ---
   asteroids.push(asteroid);

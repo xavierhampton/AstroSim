@@ -112,8 +112,40 @@ function placeAsteroid(event) {
   }
   const size = parseFloat(sizeInput.value) || 1;
   const mass = parseFloat(massInput.value) || 1;
+  const velocityMagnitude = gui.getVelocity();
+  const velocityDir = gui.getVelocityDirection();
+
+  // Calculate velocity in world space based on camera orientation
+  let velocity = null;
+  if (velocityMagnitude > 0) {
+    // Get camera's right and up vectors (screen-space X and Y)
+    const cameraRight = new THREE.Vector3();
+    const cameraUp = new THREE.Vector3();
+    camera.getWorldDirection(new THREE.Vector3()); // updates camera matrix
+    camera.matrixWorld.extractBasis(cameraRight, cameraUp, new THREE.Vector3());
+
+    // Combine arrow key input with camera vectors
+    const screenVelocity = new THREE.Vector3();
+    screenVelocity.addScaledVector(cameraRight, velocityDir.x);
+    screenVelocity.addScaledVector(cameraUp, velocityDir.y);
+
+    // Project onto tangent plane at hologram position (perpendicular to radial direction from Earth)
+    const earthCenter = sphere.position.clone();
+    const radialDir = hologram.position.clone().sub(earthCenter).normalize();
+
+    // Remove radial component to make velocity tangent to sphere (orbital)
+    const radialComponent = screenVelocity.dot(radialDir);
+    screenVelocity.addScaledVector(radialDir, -radialComponent);
+
+    // Normalize and scale by velocity magnitude
+    if (screenVelocity.length() > 0) {
+      screenVelocity.normalize().multiplyScalar(velocityMagnitude);
+      velocity = screenVelocity;
+    }
+  }
+
   const asteroid = createAsteroid(size);
-  spawnAsteroid(asteroid, hologram.position, world, scene, asteroids, mass, size);
+  spawnAsteroid(asteroid, hologram.position, world, scene, asteroids, mass, size, velocity);
   if (asteroid.body) asteroid.body.mass = mass; // example if using Cannon.js or Ammo.js
 }
 

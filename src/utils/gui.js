@@ -14,6 +14,7 @@ function setupGUI() {
 
     // --- State ---
     let timescale = parseFloat(timescaleSlider.value);
+    let placementMode = false;
 
     // --- Helper Functions ---
     const toggleDisplay = element => {
@@ -29,6 +30,7 @@ function setupGUI() {
     // --- Event Listeners ---
     asteroidBtn.addEventListener('click', () => {
       toggleDisplay(asteroidContainer)
+      placementMode = !placementMode;
       if (isActive(timescaleContainer)) {
         toggleDisplay(timescaleContainer);
       };
@@ -53,7 +55,7 @@ function setupGUI() {
 
     // --- Public API ---
     return {
-        getCurrentMode: () => currentMode,
+        getPlacementMode: () => placementMode,
         getTimescale: () => timescale,
     };
 }

@@ -54,6 +54,9 @@ startButton.addEventListener('click', () => {
   }, 800);
 });
 
+// Distance Indicator
+const distanceIndicator = document.getElementById('distanceIndicator');
+
 const launchButton = document.getElementById('launchAsteroid');
 const asteroidBtn = document.getElementById('asteroidBtn');
 const sizeInput = document.getElementById('asteroidSize');
@@ -123,7 +126,15 @@ function updateHologram(event) {
   }
 
   // Update hologram
-  if (hologram) hologram.position.copy(hologramPos);
+  if (hologram) {
+    hologram.position.copy(hologramPos);
+
+    // Update distance indicator
+    const distanceFromCenter = hologramPos.distanceTo(earthPos);
+    const distanceFromSurface = distanceFromCenter - earthRadius;
+    const distanceKm = Math.round(distanceFromSurface / KM_TO_UNITS);
+    distanceIndicator.textContent = `[${distanceKm.toLocaleString()} km]`;
+  }
 }
 
 
@@ -224,6 +235,7 @@ asteroidBtn.addEventListener('click', () => {
       createHologram();
       window.addEventListener("mousemove", updateHologram);
       window.addEventListener("keydown", placeAsteroid);
+      distanceIndicator.classList.add('visible');
       console.log("hologram active");
     } else {
       if (hologram) {
@@ -234,6 +246,7 @@ asteroidBtn.addEventListener('click', () => {
       }
       window.removeEventListener("mousemove", updateHologram);
       window.removeEventListener("keydown", placeAsteroid);
+      distanceIndicator.classList.remove('visible');
     }
   }, 0);
 })

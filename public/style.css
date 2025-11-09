@@ -247,7 +247,7 @@ body {
 
 .close-x-btn {
     position: absolute;
-    top: 16px;
+    top: 17px;
     right: 16px;
     background: rgba(100, 200, 255, 0.1);
     border: 2px solid rgba(100, 200, 255, 0.3);

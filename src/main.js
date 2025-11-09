@@ -203,19 +203,24 @@ sizeInput.addEventListener('input', () => {
 });
 
 asteroidBtn.addEventListener('click', () => {
-  if (gui.getPlacementMode()) {
-    createHologram();
-    window.addEventListener("mousemove", updateHologram);
-    window.addEventListener("keydown", placeAsteroid);
-    console.log("hologram active");
-  } else {
-    if (hologram) {
-      meshmap['hologram'] = null;
-      scene.remove(hologram);
-      console.log("hologram killed");
+  // Wait a brief moment for gui.js to update placementMode state
+  setTimeout(() => {
+    if (gui.getPlacementMode()) {
+      createHologram();
+      window.addEventListener("mousemove", updateHologram);
+      window.addEventListener("keydown", placeAsteroid);
+      console.log("hologram active");
+    } else {
+      if (hologram) {
+        meshmap['hologram'] = null;
+        scene.remove(hologram);
+        hologram = null;
+        console.log("hologram killed");
+      }
+      window.removeEventListener("mousemove", updateHologram);
+      window.removeEventListener("keydown", placeAsteroid);
     }
-    window.removeEventListener("mousemove", updateHologram);
-  }
+  }, 0);
 })
 
 function render() {

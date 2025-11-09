@@ -17,6 +17,11 @@ function animate(meshmap, controls, render, stats, world, scene, gui, composer, 
   // Queue of bodies to remove safely
   const bodiesToRemove = [];
 
+  // Hologram rotation state 
+  let holoTargetAxis = new THREE.Vector3(Math.random(), Math.random(), Math.random()).normalize();
+  let holoAngularSpeed = 0.001; 
+  let holoNextChange = performance.now() + 3000; 
+
   function loop() {
     let timescale = gui.getTimescale();
     requestAnimationFrame(loop);
@@ -26,23 +31,21 @@ function animate(meshmap, controls, render, stats, world, scene, gui, composer, 
       clouds.material.map.offset.x -= 0.3 * xspeed * speed * timescale;
     }
 
-    let holoTargetAxis = new THREE.Vector3(Math.random(), Math.random(), Math.random()).normalize();
-    let holoAngularSpeed = 0.001; // how fast it rotates
-    let holoNextChange = performance.now() + 3000; // next change in 3 seconds
+    // Hologram rotation animation
     if (meshmap['hologram']) {
-    const holo = meshmap['hologram'];
-    const now = performance.now();
+      const holo = meshmap['hologram'];
+      const now = performance.now();
 
-  // Occasionally change direction
-  if (now > holoNextChange) {
-    holoTargetAxis = new THREE.Vector3(Math.random(), Math.random(), Math.random()).normalize();
-    holoNextChange = now + 2000 + Math.random() * 3000; // every 2–5 seconds
-  }
+      // Occasionally change direction
+      if (now > holoNextChange) {
+        holoTargetAxis = new THREE.Vector3(Math.random(), Math.random(), Math.random()).normalize();
+        holoNextChange = now + 2000 + Math.random() * 3000; // every 2–5 seconds
+      }
 
-  // Smoothly drift rotation toward target
-  const deltaQuat = new THREE.Quaternion().setFromAxisAngle(holoTargetAxis, holoAngularSpeed);
-  holo.quaternion.multiplyQuaternions(deltaQuat, holo.quaternion);
-}
+      // Smoothly drift rotation toward target
+      const deltaQuat = new THREE.Quaternion().setFromAxisAngle(holoTargetAxis, holoAngularSpeed);
+      holo.quaternion.multiplyQuaternions(deltaQuat, holo.quaternion);
+    }
 
 
 

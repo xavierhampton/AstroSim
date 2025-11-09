@@ -26,14 +26,35 @@ function animate(meshmap, controls, render, stats, world, scene, gui, composer) 
       clouds.material.map.offset.x -= 0.3 * xspeed * speed * timescale;
     }
 
+    let holoTargetAxis = new THREE.Vector3(Math.random(), Math.random(), Math.random()).normalize();
+    let holoAngularSpeed = 0.001; // how fast it rotates
+    let holoNextChange = performance.now() + 3000; // next change in 3 seconds
+    if (meshmap['hologram']) {
+    const holo = meshmap['hologram'];
+    const now = performance.now();
+
+  // Occasionally change direction
+  if (now > holoNextChange) {
+    holoTargetAxis = new THREE.Vector3(Math.random(), Math.random(), Math.random()).normalize();
+    holoNextChange = now + 2000 + Math.random() * 3000; // every 2–5 seconds
+  }
+
+  // Smoothly drift rotation toward target
+  const deltaQuat = new THREE.Quaternion().setFromAxisAngle(holoTargetAxis, holoAngularSpeed);
+  holo.quaternion.multiplyQuaternions(deltaQuat, holo.quaternion);
+}
+
+
+
     // Gather all physics bodies
     const bodies = [];
     Object.values(meshmap).forEach((entry) => {
-      if (Array.isArray(entry)) {
+      if (entry == meshmap['hologram']) {}
+      else if (Array.isArray(entry)) {
         entry.forEach(mesh => {
           if (mesh.userData.physicsBody) bodies.push(mesh.userData.physicsBody);
         });
-      } else if (entry.userData.physicsBody) {
+      } else if (entry.userData && entry.userData.physicsBody) {
         bodies.push(entry.userData.physicsBody);
       }
     });
@@ -52,7 +73,8 @@ function animate(meshmap, controls, render, stats, world, scene, gui, composer) 
 
     // Sync mesh positions & rotations with physics bodies
     Object.values(meshmap).forEach((entry) => {
-      if (Array.isArray(entry)) {
+      if (entry == meshmap['hologram']) {}
+      else if (Array.isArray(entry)) {
         entry.forEach((mesh) => {
           const body = mesh.userData?.physicsBody;
           if (!body) return;
@@ -92,9 +114,10 @@ function animate(meshmap, controls, render, stats, world, scene, gui, composer) 
               // Create crater and explosion
               const radius = body.shapes[0].radius;
               const strength = body.mass;
+              const scale = radius; // Use radius as scale
               deformEarth(sphere, clouds, contactPoint, radius, strength);
-              spawnExplosion(scene, contactPoint, 100);
-              explodeAsteroid(scene, mesh);
+              spawnExplosion(scene, contactPoint, strength * 30, composer);
+              explodeAsteroid(scene, mesh, scale * 10 ,0.5, composer);
 
               // Queue the body for removal
               if (mesh.userData.physicsBody) {

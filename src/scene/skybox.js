@@ -1,48 +1,39 @@
-import * as THREE from "three"
-
+import * as THREE from "three";
 
 function setupSkybox(scene) {
-    createStarfield(scene)
+    createStarfield(scene);
 }
 
-//Uses THREE points system to make cool stars that feel real
-function createStarfield(scene, count = 1000) {
-  const starsGeometry = new THREE.BufferGeometry();
-  const positions = [];
+// Creates stars as small meshes so bloom can affect them
+function createStarfield(scene, count = 500) {
+    const minDistance = 25;
+    const stars = new THREE.Group();
 
-  //Random Positions
-  const min_distance = 25
-  for (let i = 0; i < count; i++) {
-    let distance = 0;
-    let x,y,z;
-    while (distance < min_distance) {
-        x = (Math.random() - 0.5) * 200;
-        y = (Math.random() - 0.5) * 200;
-        z = (Math.random() - 0.5) * 200;
-        distance = Math.sqrt(x ** 2 + y ** 2 + z ** 2)
+    for (let i = 0; i < count; i++) {
+        let distance = 0;
+        let x, y, z;
+
+        while (distance < minDistance) {
+            x = (Math.random() - 0.5) * 200;
+            y = (Math.random() - 0.5) * 200;
+            z = (Math.random() - 0.5) * 200;
+            distance = Math.sqrt(x ** 2 + y ** 2 + z ** 2);
+        }
+
+        const geometry = new THREE.SphereGeometry(0.3, 6, 6);
+        const material = new THREE.MeshBasicMaterial({
+            color: 0xffffff,
+            blending: THREE.AdditiveBlending, // Glow effect
+            transparent: true,
+        });
+
+        const star = new THREE.Mesh(geometry, material);
+        star.position.set(x, y, z);
+        stars.add(star);
     }
 
-    
-    positions.push(x, y, z);
-  }
-
-  //Applies positions to the starfield
-  starsGeometry.setAttribute(
-    "position",
-    new THREE.Float32BufferAttribute(positions, 3)
-  );
-
-  //Material for stars, opacity to make it non-obtrusive
-  const starsMaterial = new THREE.PointsMaterial({
-    color: 0xffffff,
-    size: 0.5,
-    transparent: true,
-    opacity: 0.8,
-  });
-  
-  const starField = new THREE.Points(starsGeometry, starsMaterial);
-  scene.add(starField);
+    scene.add(stars);
+    return stars;
 }
-
 
 export { setupSkybox };

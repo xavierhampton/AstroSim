@@ -124,14 +124,16 @@ asteroidBtn.addEventListener('click', () => {
     hologram.material.opacity = 0.5;
     hologram.material.color.set("aqua");
     hologram.material.emissive.set(0x222222); // slight glow
-    hologram.material.emissiveIntensity = 0.3;
+    hologram.material.emissiveIntensity = 3;
     hologram.children[0].material.color.set("aqua");
+    meshmap['hologram'] = hologram;
     scene.add(hologram);
     window.addEventListener("mousemove", updateHologram);
     window.addEventListener("keydown", placeAsteroid);
     console.log("hologram active");
   } else {
     if (hologram) {
+      meshmap['hologram'] = null;
       scene.remove(hologram);
       console.log("hologram killed");
     }

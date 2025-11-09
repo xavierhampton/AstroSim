@@ -100,7 +100,11 @@ function deformEarth(earthMesh, clouds, collisionPoint, radius = 0.5, strength =
         } else if (mesh === earthMesh.children[2]) {
           // Core: hardest, minimal deformation
           push *= 0.3;
-        } else {
+        } 
+        else if (mesh === earthMesh.children[3]) {
+            push = 0
+        }
+        else {
           // Outer crust or clouds: most malleable, deforms more to hide stone layer
           push *= 1.5 * noiseFactor;
         }

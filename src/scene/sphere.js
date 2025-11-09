@@ -42,6 +42,18 @@ function createSphere() {
   const core = new THREE.Mesh(geometry.clone(), coreMaterial);
   core.scale.multiplyScalar(0.8);
 
+    const innerCoreMaterial = new THREE.MeshStandardMaterial({
+    emissive: new THREE.Color(0xdddddd), 
+    emissiveIntensity: 1,               
+    color: 0xdddddd,
+    roughness: 0.1,
+    metalness: 1,
+    side: THREE.FrontSide,
+  });
+
+  const innerCore = new THREE.Mesh(geometry.clone(), innerCoreMaterial);
+  innerCore.scale.multiplyScalar(0.2);
+
   const stoneMaterial = new THREE.MeshStandardMaterial({
     map: stoneTexture,
     color: 0x777777,
@@ -61,6 +73,7 @@ function createSphere() {
   earth.add(rimSphere);
   earth.add(stoneLayer);
   earth.add(core);
+  earth.add(innerCore);
 
   earth.castShadow = true;
   earth.receiveShadow = true;
@@ -71,10 +84,8 @@ function createSphere() {
   body.angularDamping = 0.8;
   body.objectType = 'earth'; // Mark as Earth for gravity calculations
 
-  // Make Earth immovable - collisions/explosions won't move it
-  body.type = CANNON.Body.KINEMATIC; // Kinematic bodies don't respond to forces but can still detect collisions
-  body.collisionResponse = true; // Still detect collisions for crater effects
-
+  body.type = CANNON.Body.KINEMATIC; 
+  body.collisionResponse = true; 
   return earth;
 }
 

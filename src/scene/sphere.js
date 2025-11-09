@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import * as CANNON from 'cannon-es'
 import { addPhysics, setupPhysics, world } from './physicsSetup.js';
 
 
@@ -69,6 +70,10 @@ function createSphere() {
   const body = addPhysics(earth, world, { shapeType: 'sphere', mass: 2000, radius: 3 });
   body.angularDamping = 0.8;
   body.objectType = 'earth'; // Mark as Earth for gravity calculations
+
+  // Make Earth immovable - collisions/explosions won't move it
+  body.type = CANNON.Body.KINEMATIC; // Kinematic bodies don't respond to forces but can still detect collisions
+  body.collisionResponse = true; // Still detect collisions for crater effects
 
   return earth;
 }

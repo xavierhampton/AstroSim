@@ -25,12 +25,17 @@ function animate(meshmap, controls, render, stats, world, scene, gui, composer, 
     console.warn('Explosion sound not loaded. Place explosion.mp3 in resources/');
   });
 
+  // Volume control - exposed globally via window for UI control
+  if (!window.audioSettings) {
+    window.audioSettings = { volume: 0.5 };
+  }
+
   // Function to play explosion sound (creates new instance each time for stacking)
   function playExplosionSound() {
     if (!explosionSoundBuffer) return;
     const sound = new THREE.Audio(audioListener);
     sound.setBuffer(explosionSoundBuffer);
-    sound.setVolume(0.5);
+    sound.setVolume(window.audioSettings.volume);
     sound.play();
   }
 

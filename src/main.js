@@ -61,6 +61,22 @@ const infoPanel = document.getElementById('infoPanel');
 const infoBtn = document.getElementById('infoBtn');
 const closeInfoBtn = document.getElementById('closeInfo');
 
+// Volume Control
+const volumeSlider = document.getElementById('volumeSlider');
+const volumeValue = document.getElementById('volumeValue');
+
+// Initialize audio settings if not already set
+if (!window.audioSettings) {
+  window.audioSettings = { volume: 0.5 };
+}
+
+// Update volume when slider changes
+volumeSlider.addEventListener('input', (e) => {
+  const volume = e.target.value / 100;
+  window.audioSettings.volume = volume;
+  volumeValue.textContent = `${e.target.value}%`;
+});
+
 const launchButton = document.getElementById('launchAsteroid');
 const asteroidBtn = document.getElementById('asteroidBtn');
 const timerBtn = document.getElementById('timerBtn');

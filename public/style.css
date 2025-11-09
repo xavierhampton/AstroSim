@@ -117,6 +117,63 @@ body {
     margin-bottom: 28px;
 }
 
+.info-section input[type="range"] {
+    accent-color: #4af;
+    width: 100%;
+    height: 6px;
+    cursor: pointer;
+    background: rgba(100, 200, 255, 0.2);
+    border-radius: 10px;
+    outline: none;
+    margin: 8px 0;
+}
+
+.info-section input[type="range"]::-webkit-slider-thumb {
+    width: 18px;
+    height: 18px;
+    background: linear-gradient(135deg, #4af, #8ff);
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 0 10px rgba(68, 170, 255, 0.6);
+    transition: all 0.2s ease;
+}
+
+.info-section input[type="range"]::-webkit-slider-thumb:hover {
+    transform: scale(1.2);
+    box-shadow: 0 0 15px rgba(68, 170, 255, 0.8);
+}
+
+.info-section input[type="range"]::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    background: linear-gradient(135deg, #4af, #8ff);
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 0 10px rgba(68, 170, 255, 0.6);
+    transition: all 0.2s ease;
+    border: none;
+}
+
+.info-section input[type="range"]::-moz-range-thumb:hover {
+    transform: scale(1.2);
+    box-shadow: 0 0 15px rgba(68, 170, 255, 0.8);
+}
+
+.info-section label {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    display: inline-block;
+    margin-right: 12px;
+}
+
+.info-section #volumeValue {
+    color: #4af;
+    font-weight: 600;
+    font-size: 14px;
+}
+
 .info-content p {
     color: rgba(255, 255, 255, 0.9);
     line-height: 1.6;

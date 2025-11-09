@@ -3,6 +3,8 @@ import { addPhysics, setupPhysics, world } from './physicsSetup.js';
 
 
 function createSphere() {
+  // Earth scale: radius = 3 units (represents ~6371 km actual Earth radius)
+  // For asteroids: 1 unit ≈ 2124 km, so asteroid inputs are roughly in thousands of km
   const radius = 3;
   const segments = 128;
   const geometry = new THREE.SphereGeometry(radius, segments, segments);
@@ -63,6 +65,7 @@ function createSphere() {
   earth.receiveShadow = true;
 
   //Add to physics sim
+  // Earth mass: 2000 units (arbitrary scale - asteroids use same scale)
   const body = addPhysics(earth, world, { shapeType: 'sphere', mass: 2000, radius: 3 });
   body.angularDamping = 0.8;
 

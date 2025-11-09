@@ -50,8 +50,11 @@ const gui = setupGUI();
 
 // Launch asteroid button
 launchButton.addEventListener('click', () => {
-    const size = parseFloat(sizeInput.value) || 1;
-    const mass = parseFloat(massInput.value) || 1;
+    // GUI labels: "Radius (km)" and "Mass (B kg)"
+    // Note: Values are relative to Earth (radius=3, mass=2000)
+    // Size: ~1 unit per 2124 km, Mass: arbitrary units
+    const size = parseFloat(sizeInput.value) / 2124.0 || 1;
+    const mass = parseFloat(massInput.value) / 100 || 1;
 
     // Create asteroid with chosen size
     const asteroid = createAsteroid(size);

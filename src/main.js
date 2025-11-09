@@ -80,7 +80,7 @@ function placeAsteroid(event) {
     return;
   }
   const size = parseFloat(sizeInput.value) || 1;
-  const mass = parseFloat(sizeInput.value) || 1;
+  const mass = parseFloat(massInput.value) || 1;
   const asteroid = createAsteroid(size);
   spawnAsteroid(asteroid, hologram.position, world, scene, asteroids, mass, size);
   if (asteroid.body) asteroid.body.mass = mass; // example if using Cannon.js or Ammo.js

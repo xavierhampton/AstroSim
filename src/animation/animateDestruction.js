@@ -39,13 +39,36 @@ function deformEarth(earthMesh, clouds, collisionPoint, radius = 0.5, strength =
 
   const center = new THREE.Vector3(0, 0, 0);
   const tempVec = new THREE.Vector3();
+  const originalVec = new THREE.Vector3();
 
   meshesToDeform.forEach((mesh, idx) => {
     const position = mesh.geometry.attributes.position;
 
+    // Initialize original positions and deformation tracking if not already done
+    if (!mesh.userData.originalPositions) {
+      mesh.userData.originalPositions = new Float32Array(position.count * 3);
+      mesh.userData.cumulativeDeformation = new Float32Array(position.count);
+
+      for (let i = 0; i < position.count; i++) {
+        mesh.userData.originalPositions[i * 3] = position.getX(i);
+        mesh.userData.originalPositions[i * 3 + 1] = position.getY(i);
+        mesh.userData.originalPositions[i * 3 + 2] = position.getZ(i);
+        mesh.userData.cumulativeDeformation[i] = 0;
+      }
+    }
+
+    // Maximum allowed deformation as a percentage of the original distance from center
+    const MAX_DEFORMATION_PERCENT = 0.95; // 15% max deformation
+
     for (let i = 0; i < position.count; i++) {
-      tempVec.fromBufferAttribute(position, i);
-      const dist = tempVec.distanceTo(localCollision);
+      // Use original positions for distance calculation
+      originalVec.set(
+        mesh.userData.originalPositions[i * 3],
+        mesh.userData.originalPositions[i * 3 + 1],
+        mesh.userData.originalPositions[i * 3 + 2]
+      );
+
+      const dist = originalVec.distanceTo(localCollision);
       if (dist < radius) {
         // Mass controls depth, radius controls size but reduces depth
         // Larger radius = wider crater but shallower
@@ -53,8 +76,8 @@ function deformEarth(earthMesh, clouds, collisionPoint, radius = 0.5, strength =
         let push = (1 - dist / radius) * depthFactor;
 
         // Add subtle noise factor to make rock look jagged and tougher
-        const noise = simplex.noise3D(tempVec.x * 3, tempVec.y * 3, tempVec.z * 3);
-        const noiseFactor = 1.0 + noise * 0.3; // ±20% variance
+        const noise = simplex.noise3D(originalVec.x * 3, originalVec.y * 3, originalVec.z * 3);
+        const noiseFactor = 1.0 + noise * 0.3; // ±30% variance
 
         // Different toughness based on layer
         if (mesh === earthMesh.children[1]) {
@@ -68,17 +91,27 @@ function deformEarth(earthMesh, clouds, collisionPoint, radius = 0.5, strength =
           push *= 1.5 * noiseFactor;
         }
 
-        const radialDir = tempVec.clone().sub(center).normalize();
+        const radialDir = originalVec.clone().sub(center).normalize();
+
+        // Check cumulative deformation limit
+        const originalDist = originalVec.length();
+        const maxAllowedDeformation = originalDist * MAX_DEFORMATION_PERCENT;
+        const remainingDeformation = maxAllowedDeformation - mesh.userData.cumulativeDeformation[i];
+
+        // Clamp push to remaining allowed deformation
+        const actualPush = Math.max(0, Math.min(push, remainingDeformation));
 
         // Check how far we'd push, and clamp if it would go past center
-        const currentDist = tempVec.length();
-        const minAllowedDist = 0.2; // Minimum distance from center
+        const minAllowedDist = 0.5; // Minimum distance from center (increased from 0.2)
+        const currentDist = originalVec.length() - mesh.userData.cumulativeDeformation[i];
+        const maxPushFromCenter = currentDist - minAllowedDist;
+        const finalPush = Math.min(actualPush, maxPushFromCenter);
 
-        // Only push as much as we can without crossing the minimum
-        const maxPush = currentDist - minAllowedDist;
-        const actualPush = Math.min(push, maxPush);
+        // Update cumulative deformation
+        mesh.userData.cumulativeDeformation[i] += finalPush;
 
-        tempVec.addScaledVector(radialDir, -actualPush);
+        // Apply deformation from original position
+        tempVec.copy(originalVec).addScaledVector(radialDir, -mesh.userData.cumulativeDeformation[i]);
         position.setXYZ(i, tempVec.x, tempVec.y, tempVec.z);
       }
     }

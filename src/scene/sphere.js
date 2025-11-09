@@ -28,16 +28,16 @@ function createSphere() {
 
 
   const coreMaterial = new THREE.MeshStandardMaterial({
-    emissive: new THREE.Color(0xff6600), // orange glow
-    emissiveIntensity: 2,
+    emissive: new THREE.Color(0xffaa33), 
+    emissiveIntensity: 10,               
     color: 0x552200,
-    roughness: 0.3,
-    metalness: 0.8,
-    side: THREE.FrontSide, // Only render front-facing polygons
+    roughness: 0.1,
+    metalness: 0.9,
+    side: THREE.FrontSide,
   });
 
   const core = new THREE.Mesh(geometry.clone(), coreMaterial);
-  core.scale.multiplyScalar(0.6);
+  core.scale.multiplyScalar(0.8);
 
   const stoneMaterial = new THREE.MeshStandardMaterial({
     map: stoneTexture,

@@ -5,7 +5,7 @@ import { applyNBodyGravity, spawnExplosion, deformEarth, explodeAsteroid } from 
 let clouds;
 let sphere;
 
-function animate(meshmap, controls, render, stats, world, scene, gui) {
+function animate(meshmap, controls, render, stats, world, scene, gui, composer) {
   sphere = meshmap["sphere"];
   clouds = meshmap["clouds"];
   const speed = 0.00001;
@@ -128,8 +128,9 @@ function animate(meshmap, controls, render, stats, world, scene, gui) {
     controls.update();
     render();
     stats.update();
-  }
+    composer.render();
 
+  }
   loop();
 }
 

@@ -7,7 +7,22 @@ import { setupGUI } from './utils/gui.js';
 import { animate } from './animation/animate.js';
 import { createClouds } from './scene/clouds.js';
 import { createAsteroid, spawnAsteroid } from './scene/asteroid.js';
+import * as THREE from "three"
+import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
 
+//ADD POST PROCESSING
+const composer = new EffectComposer(renderer);
+composer.addPass(new RenderPass(scene, camera));
+
+const bloomPass = new UnrealBloomPass(
+    new THREE.Vector2(window.innerWidth, window.innerHeight),
+    1, // strength
+    0.2, // radius
+    0.85 // threshold
+);
+composer.addPass(bloomPass);
 
 
 const meshmap = {};
@@ -53,4 +68,4 @@ function render() {
 }
 
 handleResize(camera, renderer, render);
-animate(meshmap, controls, render, stats, world, scene, gui);
+animate(meshmap, controls, render, stats, world, scene, gui, composer);

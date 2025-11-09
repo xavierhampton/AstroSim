@@ -70,6 +70,10 @@ if (!window.audioSettings) {
   window.audioSettings = { volume: 0.5 };
 }
 
+// Set initial volume from slider value on load
+window.audioSettings.volume = volumeSlider.value / 100;
+volumeValue.textContent = `${volumeSlider.value}%`;
+
 // Update volume when slider changes
 volumeSlider.addEventListener('input', (e) => {
   const volume = e.target.value / 100;

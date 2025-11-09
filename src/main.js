@@ -56,6 +56,11 @@ startButton.addEventListener('click', () => {
 // Distance Indicator
 const distanceIndicator = document.getElementById('distanceIndicator');
 
+// Info Panel
+const infoPanel = document.getElementById('infoPanel');
+const infoBtn = document.getElementById('infoBtn');
+const closeInfoBtn = document.getElementById('closeInfo');
+
 const launchButton = document.getElementById('launchAsteroid');
 const asteroidBtn = document.getElementById('asteroidBtn');
 const timerBtn = document.getElementById('timerBtn');
@@ -89,6 +94,22 @@ const placeAsteroidHandler = (event) => placeAsteroid(event, sizeInput, massInpu
 sizeInput.addEventListener('input', () => {
   if (gui.getPlacementMode()) {
     createHologramMesh(sizeInput, scene, meshmap, updateHologramHandler);
+  }
+});
+
+// Info button click handler
+infoBtn.addEventListener('click', () => {
+  infoPanel.classList.add('visible');
+});
+
+closeInfoBtn.addEventListener('click', () => {
+  infoPanel.classList.remove('visible');
+});
+
+// Close info panel when clicking outside the content
+infoPanel.addEventListener('click', (e) => {
+  if (e.target === infoPanel) {
+    infoPanel.classList.remove('visible');
   }
 });
 

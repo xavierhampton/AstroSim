@@ -43,6 +43,150 @@ body {
     }
 }
 
+/* Info Panel */
+.info-panel {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(10px);
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.info-panel.visible {
+    opacity: 1;
+    pointer-events: all;
+}
+
+.info-content {
+    background: rgba(30, 30, 40, 0.95);
+    backdrop-filter: blur(20px);
+    border: 2px solid rgba(100, 200, 255, 0.4);
+    border-radius: 16px;
+    padding: 32px;
+    max-width: 600px;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6),
+                0 0 40px rgba(68, 170, 255, 0.2);
+    color: white;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    animation: slideInScale 0.4s ease-out;
+}
+
+@keyframes slideInScale {
+    from {
+        transform: translateY(30px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.info-content h2 {
+    font-size: 2.5rem;
+    font-weight: 300;
+    margin: 0 0 24px 0;
+    letter-spacing: 0.2rem;
+    background: linear-gradient(135deg, #ffffff, #4af, #8ff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-align: center;
+}
+
+.info-content h3 {
+    font-size: 1.3rem;
+    font-weight: 500;
+    margin: 0 0 12px 0;
+    color: #4af;
+    letter-spacing: 0.1rem;
+}
+
+.info-section {
+    margin-bottom: 28px;
+}
+
+.info-content p {
+    color: rgba(255, 255, 255, 0.9);
+    line-height: 1.6;
+    margin: 8px 0;
+}
+
+.info-content ul {
+    list-style: none;
+    padding: 0;
+    margin: 8px 0;
+}
+
+.info-content ul li {
+    color: rgba(255, 255, 255, 0.85);
+    line-height: 1.8;
+    padding-left: 20px;
+    position: relative;
+    margin-bottom: 8px;
+}
+
+.info-content ul li::before {
+    content: '▹';
+    position: absolute;
+    left: 0;
+    color: #4af;
+    font-size: 1.2em;
+}
+
+.info-content strong {
+    color: #8ff;
+}
+
+.info-link {
+    color: #4af;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    border-bottom: 1px solid transparent;
+}
+
+.info-link:hover {
+    color: #8ff;
+    border-bottom-color: #8ff;
+}
+
+.close-info-btn {
+    background: rgba(100, 200, 255, 0.2);
+    border: 2px solid #4af;
+    border-radius: 8px;
+    padding: 12px 32px;
+    color: white;
+    font-size: 1rem;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    letter-spacing: 0.1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 100%;
+    margin-top: 16px;
+    font-weight: 600;
+}
+
+.close-info-btn:hover {
+    background: rgba(100, 200, 255, 0.4);
+    border-color: #8ff;
+    box-shadow: 0 4px 15px rgba(68, 170, 255, 0.3);
+}
+
+.close-info-btn:active {
+    transform: scale(0.98);
+}
+
 /* Start Screen Overlay */
 .start-screen {
     position: fixed;
@@ -126,6 +270,56 @@ body {
         opacity: 1;
         transform: translateY(0);
     }
+}
+
+/* Info Button (Bottom Right) */
+.info-btn {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    background: rgba(30, 30, 40, 0.85);
+    border: 2px solid rgba(100, 200, 255, 0.3);
+    border-radius: 12px;
+    padding: 0;
+    aspect-ratio: 1/1;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-family: sans-serif;
+    font-size: 32px;
+    width: 70px;
+    height: 70px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    z-index: 10;
+    opacity: 0;
+    animation: fadeInBottomRight 0.6s ease-out 0.4s forwards;
+}
+
+@keyframes fadeInBottomRight {
+    from {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.info-btn:hover {
+    transform: translateY(-5px) scale(1.05);
+    border-color: #4af;
+    box-shadow: 0 6px 25px rgba(68, 170, 255, 0.4),
+                0 0 20px rgba(68, 170, 255, 0.2);
+    background: rgba(40, 50, 70, 0.9);
+}
+
+.info-btn:active {
+    transform: translateY(-5px) scale(0.98);
 }
 
 /* UI container */

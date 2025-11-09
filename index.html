@@ -28,13 +28,46 @@
         <div id="startScreen" class="start-screen">
             <div class="start-content">
                 <h1 class="start-title">AstroSim</h1>
-                <p class="start-subtitle">Explore the Cosmos</p>
+                <p class="start-subtitle">Explode the Cosmos</p>
                 <button id="startButton" class="start-button">Begin Simulation</button>
             </div>
         </div>
 
         <!-- Distance Indicator -->
         <div id="distanceIndicator" class="distance-indicator">[— km]</div>
+
+        <!-- Info Panel -->
+        <div id="infoPanel" class="info-panel">
+            <div class="info-content">
+                <h2>AstroSim</h2>
+
+                <div class="info-section">
+                    <h3>Controls</h3>
+                    <ul>
+                        <li><strong>Camera:</strong> Left click + drag to rotate, right click + drag to pan, scroll to zoom</li>
+                        <li><strong>Asteroid Mode:</strong> Click ☄️ to enter placement mode</li>
+                        <li><strong>Mouse:</strong> Move to position asteroid hologram</li>
+                        <li><strong>SPACEBAR:</strong> Summon asteroid at hologram position</li>
+                        <li><strong>Arrow Keys:</strong> Set velocity direction</li>
+                    </ul>
+                </div>
+
+                <div class="info-section">
+                    <h3>Credits</h3>
+                    <p><strong>Created by:</strong> Xavier Hampton & Keehin McCann</p>
+                    <p><strong>Repo: </strong><a class="info-link" href="https://github.com/xavierhampton/AstroSim" target="_blank">https://github.com/xavierhampton/AstroSim</a></p>
+                    <p><strong>Assets:</strong></p>
+                    <ul>
+                        <li>Three.js - 3D graphics library</li>
+                        <li>Cannon.js - Physics engine</li>
+                        <li>Earth & Cloud Texture - <a class="info-link" href="https://www.solarsystemscope.com/textures/" target="_blank">Solar System Scope</a></li>
+                        <li>Asteroid Texture - <a class="info-link" href="https://www.freepik.com/free-photo/photo-stone-texture-pattern_226230331.htm" target="_blank">Freepik</a></li>
+                    </ul>
+                </div>
+
+                <button id="closeInfo" class="close-info-btn">Close</button>
+            </div>
+        </div>
 
         <div class="ui-container">
             <div style="position: relative; display: flex; align-items: center;">
@@ -62,6 +95,9 @@
             </div>
             <button id="restartBtn" class="mode-btn"><span style="margin-bottom: 8px;">⟳</span></button>
         </div>
+
+        <!-- Info Button (Bottom Right) -->
+        <button id="infoBtn" class="info-btn"><span style="margin-bottom: 4px;">?</span></button>
 
         <script type="module" src="/src/main.js"></script>
     </body>

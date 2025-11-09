@@ -40,7 +40,7 @@ function deformEarth(earthMesh, clouds, collisionPoint, radius = 0.5, strength =
   const center = new THREE.Vector3(0, 0, 0);
   const tempVec = new THREE.Vector3();
   const originalVec = new THREE.Vector3();
-
+ 
   meshesToDeform.forEach((mesh, idx) => {
     const position = mesh.geometry.attributes.position;
 
@@ -121,103 +121,157 @@ function deformEarth(earthMesh, clouds, collisionPoint, radius = 0.5, strength =
   });
 }
 
-function spawnExplosion(scene, position, numParticles = 50) {
-  const geometry = new THREE.BufferGeometry();
-  const vertices = [];
 
-  for (let i = 0; i < numParticles; i++) {
-    vertices.push(position.x, position.y, position.z);
-  }
-  geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
-
-  const material = new THREE.PointsMaterial({ color: 0xffaa33, size: 0.2 });
-  const points = new THREE.Points(geometry, material);
-  scene.add(points);
-
-  const velocities = [];
-  for (let i = 0; i < vertices.length / 3; i++) {
-    velocities.push(new THREE.Vector3(
-      (Math.random() - 0.5) * 0.2,
-      (Math.random() - 0.5) * 0.2,
-      (Math.random() - 0.5) * 0.2
-    ));
-  }
-
+// Camera shake - scales with strength (density)
+function shakeCamera(camera, strength = 1) {
+  const orig = camera.position.clone();
   let t = 0;
-  function explode() {
-    t++;
-    const pos = points.geometry.attributes.position;
-    for (let i = 0; i < pos.count; i++) {
-      const v = velocities[i];
-      pos.setXYZ(i,
-        pos.getX(i) + v.x,
-        pos.getY(i) + v.y,
-        pos.getZ(i) + v.z
-      );
-    }
-    pos.needsUpdate = true;
-
-    if (t < 30) requestAnimationFrame(explode);
-    else scene.remove(points);
+  function shake() {
+    const decay = 1 - t++ / 30;
+    camera.position.set(
+      orig.x + (Math.random() - 0.5) * strength * decay * 0.1,
+      orig.y + (Math.random() - 0.5) * strength * decay * 0.1,
+      orig.z + (Math.random() - 0.5) * strength * decay * 0.1
+    );
+    if (t < 30) requestAnimationFrame(shake);
+    else camera.position.copy(orig);
   }
-  explode();
+  shake();
 }
 
+function spawnExplosion(scene, position, strength = 1, composer = null, camera = null) {
+  if (camera) shakeCamera(camera, strength);
 
-function explodeAsteroid(scene, asteroidMesh, numPieces = 30, force = 0.5) {
+  const fireballs = [];
+  const n = Math.floor(15 + strength * 5);
 
-  const asteroidWorldPos = new THREE.Vector3();
-  asteroidMesh.getWorldPosition(asteroidWorldPos);
-
-  for (let i = 0; i < numPieces; i++) {
-    // Create a small shard
-    const shardRadius = 0.3 + Math.random() * 0.2;
-    const shardGeometry = new THREE.SphereGeometry(shardRadius, 4, 4);
-
-    const material = new THREE.MeshStandardMaterial({
-      color: 0x888888,
-      roughness: 1,
-      metalness: 0,
+  // Create explosive fireballs shooting outward
+  for (let i = 0; i < n; i++) {
+    const size = (0.2 + Math.random() * 0.3) * strength * 0.25; // 75% smaller
+    const geo = new THREE.SphereGeometry(size, 8, 8);
+    const mat = new THREE.MeshBasicMaterial({
+      color: new THREE.Color().setHSL(Math.random() * 0.1, 1, 0.5 + Math.random() * 0.3), // Orange to yellow
+      transparent: true,
+      opacity: 1,
+      blending: THREE.AdditiveBlending
     });
+    const ball = new THREE.Mesh(geo, mat);
+    ball.position.copy(position);
+    scene.add(ball);
 
-    const shard = new THREE.Mesh(shardGeometry, material);
-
-    // Position shards randomly around the asteroid
-    shard.position.copy(asteroidWorldPos);
-    shard.position.x += (Math.random() - 0.5) * 0.5;
-    shard.position.y += (Math.random() - 0.5) * 0.5;
-    shard.position.z += (Math.random() - 0.5) * 0.5;
-
-    shard.castShadow = true;
-    shard.receiveShadow = true;
-
-    scene.add(shard);
-
-    // Random velocity
-    const velocity = new THREE.Vector3(
-      (Math.random() - 0.5) * force,
-      (Math.random() - 0.5) * force,
-      (Math.random() - 0.5) * force
+    // Random outward velocity - spherical distribution (slower)
+    const theta = Math.random() * Math.PI * 2;
+    const phi = Math.acos(2 * Math.random() - 1);
+    const speed = (0.05 + Math.random() * 0.05) * strength; // Much slower
+    const vel = new THREE.Vector3(
+      Math.sin(phi) * Math.cos(theta) * speed,
+      Math.sin(phi) * Math.sin(theta) * speed,
+      Math.cos(phi) * speed
     );
 
-    // Animate shard
-    let t = 0;
-    const lifespan = 100;
-    function moveShard() {
-      t++;
-      shard.position.add(velocity);
-      shard.rotation.x += Math.random() * 0.1;
-      shard.rotation.y += Math.random() * 0.1;
-      shard.rotation.z += Math.random() * 0.1;
+    fireballs.push({ mesh: ball, vel, geo, mat, life: 0, maxLife: 40 + Math.random() * 30 }); // Longer life
+  }
 
-      if (t < lifespan) requestAnimationFrame(moveShard);
-      else scene.remove(shard);
+  // Dust/smoke ring
+  const dustGeo = new THREE.TorusGeometry(0.1 * strength * 0.25, 0.3 * strength * 0.25, 8, 16); // 75% smaller
+  const dustMat = new THREE.MeshBasicMaterial({
+    color: 0x888888,
+    transparent: true,
+    opacity: 0.4,
+    blending: THREE.NormalBlending
+  });
+  const dust = new THREE.Mesh(dustGeo, dustMat);
+  dust.position.copy(position);
+  dust.lookAt(position.clone().add(new THREE.Vector3(0, 1, 0)));
+  scene.add(dust);
+
+  let t = 0;
+  function anim() {
+    t++;
+    const globalProgress = t / 50;
+
+    // Animate fireballs
+    fireballs.forEach((fb, idx) => {
+      fb.life++;
+      const p = fb.life / fb.maxLife;
+
+      // Move
+      fb.mesh.position.add(fb.vel);
+      fb.vel.multiplyScalar(0.98); // Less deceleration
+
+      // Scale and fade - much slower scaling
+      fb.mesh.scale.setScalar(1 + p * 0.2);
+      fb.mat.opacity = Math.max(0, 1 - p);
+
+      // Color shift from white-yellow to red-orange
+      fb.mat.color.setHSL(Math.min(0.1, p * 0.1), 1, Math.max(0.2, 0.7 - p * 0.5));
+
+      if (fb.life >= fb.maxLife) {
+        scene.remove(fb.mesh);
+        fb.geo.dispose();
+        fb.mat.dispose();
+        fireballs.splice(idx, 1);
+      }
+    });
+
+    // Expand and fade dust
+    dust.scale.setScalar(1 + globalProgress * 4);
+    dustMat.opacity = Math.max(0, 0.4 - globalProgress * 0.6);
+
+    if (t < 50 && fireballs.length === 0) {
+      scene.remove(dust);
+      dustGeo.dispose();
+      dustMat.dispose();
+      return;
     }
-    moveShard();
+
+    if (t < 50 || fireballs.length > 0) {
+      requestAnimationFrame(anim);
+    } else {
+      scene.remove(dust);
+      dustGeo.dispose();
+      dustMat.dispose();
+    }
+  }
+  anim();
+}
+
+
+function explodeAsteroid(scene, mesh, strength = 1, force = 0.5, composer = null, camera = null) {
+  const pos = new THREE.Vector3();
+  mesh.getWorldPosition(pos);
+
+  spawnExplosion(scene, pos, strength, composer, camera);
+
+  for (let i = 0; i < 10; i++) { // Minimal debris
+    const geo = new THREE.SphereGeometry(0.2, 4, 4);
+    const mat = new THREE.MeshBasicMaterial({
+      color: Math.random() > 0.5 ? 0xff6600 : 0x888888,
+      transparent: true
+    });
+    const shard = new THREE.Mesh(geo, mat);
+    shard.position.set(pos.x + (Math.random() - 0.5) * 0.5, pos.y + (Math.random() - 0.5) * 0.5, pos.z + (Math.random() - 0.5) * 0.5);
+    scene.add(shard);
+
+    const vel = new THREE.Vector3((Math.random() - 0.5) * force, (Math.random() - 0.5) * force, (Math.random() - 0.5) * force);
+    let t = 0;
+    function move() {
+      shard.position.add(vel);
+      shard.rotation.x += 0.05;
+      shard.rotation.y += 0.05;
+      mat.opacity = 1 - t++ / 80;
+      if (t < 80) requestAnimationFrame(move);
+      else {
+        scene.remove(shard);
+        geo.dispose();
+        mat.dispose();
+      }
+    }
+    move();
   }
 }
 
 
 
 
-export { applyNBodyGravity, spawnExplosion, deformEarth, explodeAsteroid };
+export { applyNBodyGravity, spawnExplosion, deformEarth, explodeAsteroid};

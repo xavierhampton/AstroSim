@@ -5,12 +5,12 @@ import { applyNBodyGravity, spawnExplosion, deformEarth, explodeAsteroid } from 
 let clouds;
 let sphere;
 
-function animate(meshmap, controls, render, stats, world, scene, gui, composer) {
+function animate(meshmap, controls, render, stats, world, scene, gui, composer, camera) {
   sphere = meshmap["sphere"];
   clouds = meshmap["clouds"];
   const speed = 0.00001;
   const xspeed = 6;
-  
+
   // N-body gravity constant
   const G = 5;
 
@@ -114,10 +114,9 @@ function animate(meshmap, controls, render, stats, world, scene, gui, composer) 
               // Create crater and explosion
               const radius = body.shapes[0].radius;
               const strength = body.mass;
-              const scale = radius; // Use radius as scale
               deformEarth(sphere, clouds, contactPoint, radius, strength);
-              spawnExplosion(scene, contactPoint, strength * 30, composer);
-              explodeAsteroid(scene, mesh, scale * 10 ,0.5, composer);
+              spawnExplosion(scene, contactPoint, strength, composer, camera);
+              explodeAsteroid(scene, mesh, strength, 0.5, composer, camera);
 
               // Queue the body for removal
               if (mesh.userData.physicsBody) {
@@ -150,7 +149,7 @@ function animate(meshmap, controls, render, stats, world, scene, gui, composer) 
     controls.target.copy(sphere.position); 
     controls.update();
     render();
-    stats.update();
+    // stats.update();
     composer.render();
 
   }

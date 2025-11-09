@@ -17,6 +17,12 @@ const raycaster = new Raycaster();
 const mouse = new Vector2();
 const placementPlane = new Plane(); // camera normal plane
 
+// Scaling constants for realistic input values
+// Earth radius = 3 units = 6371 km, so 1 unit ≈ 2124 km
+const KM_TO_UNITS = 1 / 2124; // Convert km to simulation units
+const MASS_SCALE = 1; // Mass input is in 10^12 kg, simulation uses arbitrary units (keep 1:1 for now)
+const VELOCITY_SCALE = 0.01; // Convert km/s to simulation velocity units (tuned for visual effect)
+
 //ADD POST PROCESSING
 const composer = new EffectComposer(renderer);
 composer.addPass(new RenderPass(scene, camera));
@@ -60,6 +66,9 @@ const placementOffset = 1.5;
 const earthRadius = 3;
 
 function updateHologram(event) {
+  // Store last mouse event for hologram recreation
+  window.lastMouseEvent = event;
+
   mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
   mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
 
@@ -114,9 +123,15 @@ function placeAsteroid(event) {
   event.preventDefault();
   event.stopPropagation();
 
-  const size = parseFloat(sizeInput.value) || 1;
-  const mass = parseFloat(massInput.value) || 1;
-  const velocityMagnitude = gui.getVelocity();
+  // Get user input values and scale them to simulation units
+  const sizeKm = parseFloat(sizeInput.value) || 500;
+  const size = sizeKm * KM_TO_UNITS; // Convert km to simulation units
+
+  const massInput12kg = parseFloat(massInput.value) || 1;
+  const mass = massInput12kg * MASS_SCALE; // Convert 10^12 kg to simulation units
+
+  const velocityKmPerS = gui.getVelocity();
+  const velocityMagnitude = velocityKmPerS * VELOCITY_SCALE; // Convert km/s to simulation velocity
   const velocityDir = gui.getVelocityDirection();
 
   // Calculate velocity in world space based on camera orientation
@@ -153,17 +168,43 @@ function placeAsteroid(event) {
   if (asteroid.body) asteroid.body.mass = mass; 
 }
 
+// Function to create/recreate hologram with current size
+function createHologram() {
+  const sizeKm = parseFloat(sizeInput.value) || 500;
+  const size = sizeKm * KM_TO_UNITS;
+
+  // Remove old hologram if it exists
+  if (hologram) {
+    scene.remove(hologram);
+  }
+
+  // Create new hologram
+  hologram = createAsteroid(size);
+  hologram.material.transparent = true;
+  hologram.material.opacity = 0.5;
+  hologram.material.color.set("aqua");
+  hologram.material.emissive.set(0x222222); // slight glow
+  hologram.material.emissiveIntensity = 3;
+  hologram.children[0].material.color.set("aqua");
+  meshmap['hologram'] = hologram;
+  scene.add(hologram);
+
+  // Update hologram position immediately
+  if (window.lastMouseEvent) {
+    updateHologram(window.lastMouseEvent);
+  }
+}
+
+// Update hologram when size input changes
+sizeInput.addEventListener('input', () => {
+  if (gui.getPlacementMode() && hologram) {
+    createHologram();
+  }
+});
+
 asteroidBtn.addEventListener('click', () => {
   if (gui.getPlacementMode()) {
-    hologram = createAsteroid(sizeInput.value) || 1;
-    hologram.material.transparent = true;
-    hologram.material.opacity = 0.5;
-    hologram.material.color.set("aqua");
-    hologram.material.emissive.set(0x222222); // slight glow
-    hologram.material.emissiveIntensity = 3;
-    hologram.children[0].material.color.set("aqua");
-    meshmap['hologram'] = hologram;
-    scene.add(hologram);
+    createHologram();
     window.addEventListener("mousemove", updateHologram);
     window.addEventListener("keydown", placeAsteroid);
     console.log("hologram active");

@@ -141,13 +141,13 @@
                 <button id="asteroidBtn" class="mode-btn">☄️</button>
                 <div id="asteroidContainer" class="asteroid-container">
                     <label for="asteroidSize">Radius (km)</label>
-                    <input type="number" id="asteroidSize" min="0.1" max="10" step="0.1" value="1">
+                    <input type="number" id="asteroidSize" min="1" max="5000" step="1" value="500">
 
-                    <label for="asteroidMass">Mass (B kg)</label>
-                    <input type="number" id="asteroidMass" min="0.1" max="10" step="0.1" value="1">
+                    <label for="asteroidMass">Mass (10^12 kg)</label>
+                    <input type="number" id="asteroidMass" min="0.01" max="1000" step="0.01" value="1">
 
-                    <label for="asteroidVelocity">Velocity</label>
-                    <input type="number" id="asteroidVelocity" min="0" max="10" step="0.1" value="0">
+                    <label for="asteroidVelocity">Velocity (km/s)</label>
+                    <input type="number" id="asteroidVelocity" min="0" max="100" step="0.1" value="0">
 
                     <label style="color: #4af; font-size: 10px;">Use arrow keys for direction</label>
                 </div>

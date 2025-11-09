@@ -69,7 +69,7 @@ function animate(meshmap, controls, render, stats, world, scene, gui, composer, 
     }
 
     // Step the physics world
-    world.step((1 / 60) * timescale);
+    world.step((1 / 60) * timescale * 0.1);
 
     // Sync mesh positions & rotations with physics bodies
     Object.values(meshmap).forEach((entry) => {
@@ -112,11 +112,18 @@ function animate(meshmap, controls, render, stats, world, scene, gui, composer, 
               const contactPoint = earthCenter.clone().add(directionToAsteroid.multiplyScalar(earthRadius));
 
               // Create crater and explosion
-              const radius = body.shapes[0].radius;
-              const strength = body.mass;
-              deformEarth(sphere, clouds, contactPoint, radius, strength);
-              spawnExplosion(scene, contactPoint, strength, composer, camera);
-              explodeAsteroid(scene, mesh, strength, 0.5, composer, camera);
+              const asteroidRadius = body.shapes[0].radius;
+              const asteroidMass = body.mass;
+
+              // Scale crater size and strength for realistic deformation
+              // Crater radius is typically 10-20x the projectile radius
+              const craterRadius = asteroidRadius * 15;
+              // Impact strength scaled by mass and velocity
+              const impactStrength = asteroidMass * 2;
+
+              deformEarth(sphere, clouds, contactPoint, craterRadius, impactStrength);
+              spawnExplosion(scene, contactPoint, impactStrength, composer, camera);
+              explodeAsteroid(scene, mesh, impactStrength, 0.5, composer, camera);
 
               // Queue the body for removal
               if (mesh.userData.physicsBody) {

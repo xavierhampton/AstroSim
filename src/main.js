@@ -110,6 +110,10 @@ function placeAsteroid(event) {
   if (event.code !== "Space") {
     return;
   }
+  // Prevent space from triggering GUI buttons
+  event.preventDefault();
+  event.stopPropagation();
+
   const size = parseFloat(sizeInput.value) || 1;
   const mass = parseFloat(massInput.value) || 1;
   const velocityMagnitude = gui.getVelocity();

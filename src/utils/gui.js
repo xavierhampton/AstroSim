@@ -29,7 +29,6 @@ function setupGUI() {
         timescaleNumber.value = timescale;
     };
 
-    // --- Event Listeners ---
     asteroidBtn.addEventListener('click', () => {
       toggleDisplay(asteroidContainer)
       placementMode = !placementMode;
@@ -94,7 +93,6 @@ function setupGUI() {
         }
     });
 
-    // --- Public API ---
     return {
         getPlacementMode: () => placementMode,
         getTimescale: () => timescale,

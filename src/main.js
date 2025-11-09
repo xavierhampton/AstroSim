@@ -59,7 +59,6 @@ const distanceIndicator = document.getElementById('distanceIndicator');
 // Info Panel
 const infoPanel = document.getElementById('infoPanel');
 const infoBtn = document.getElementById('infoBtn');
-const closeInfoBtn = document.getElementById('closeInfo');
 const closeInfoXBtn = document.getElementById('closeInfoX');
 
 // Volume Control
@@ -121,10 +120,6 @@ sizeInput.addEventListener('input', () => {
 // Info button click handler
 infoBtn.addEventListener('click', () => {
   infoPanel.classList.add('visible');
-});
-
-closeInfoBtn.addEventListener('click', () => {
-  infoPanel.classList.remove('visible');
 });
 
 closeInfoXBtn.addEventListener('click', () => {

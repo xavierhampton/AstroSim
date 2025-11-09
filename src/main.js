@@ -61,6 +61,17 @@ function updateHologram(event) {
   // Optional: draw line from Earth center to hologram
 }
 
+function placeAsteroid(event) {
+  if (event.code !== "Space") {
+    return;
+  }
+  const size = parseFloat(sizeInput.value) || 1;
+  const mass = parseFloat(sizeInput.value) || 1;
+  const asteroid = createAsteroid(size);
+  spawnAsteroid(asteroid, hologram.position, world, scene, asteroids, mass, size);
+  if (asteroid.body) asteroid.body.mass = mass; // example if using Cannon.js or Ammo.js
+}
+
 asteroidBtn.addEventListener('click', () => {
   if (gui.getPlacementMode()) {
     hologram = createAsteroid(sizeInput.value) || 1;
@@ -72,11 +83,12 @@ asteroidBtn.addEventListener('click', () => {
     hologram.children[0].material.color.set("aqua");
     scene.add(hologram);
     window.addEventListener("mousemove", updateHologram);
-    console.log("hologram active")
+    window.addEventListener("keydown", placeAsteroid);
+    console.log("hologram active");
   } else {
     if (hologram) {
       scene.remove(hologram);
-      console.log("hologram killed")
+      console.log("hologram killed");
     }
     window.removeEventListener("mousemove", updateHologram);
   }

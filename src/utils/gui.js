@@ -7,6 +7,7 @@ function setupGUI() {
     // --- DOM Elements ---
     const asteroidBtn = document.getElementById('asteroidBtn');
     const timerBtn = document.getElementById('timerBtn');
+    const restartBtn = document.getElementById('restartBtn');
     const asteroidContainer = document.getElementById('asteroidContainer');
     const timescaleContainer = document.getElementById('timescaleContainer');
     const timescaleSlider = document.getElementById('timescaleSlider');
@@ -17,6 +18,7 @@ function setupGUI() {
     let timescale = parseFloat(timescaleSlider.value);
     let placementMode = false;
     let velocityDirection = { x: 0, y: 0 }; // 2D direction in screen space
+    let restartCallback = null;
 
     // --- Helper Functions ---
     const toggleDisplay = element => {
@@ -94,11 +96,18 @@ function setupGUI() {
         }
     });
 
+    restartBtn.addEventListener('click', () => {
+        if (restartCallback) {
+            restartCallback();
+        }
+    });
+
     return {
         getPlacementMode: () => placementMode,
         getTimescale: () => timescale,
         getVelocity: () => parseFloat(velocityInput.value) || 0,
         getVelocityDirection: () => ({ x: velocityDirection.x, y: velocityDirection.y }),
+        setRestartCallback: (callback) => { restartCallback = callback; },
     };
 }
 

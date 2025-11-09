@@ -59,6 +59,7 @@ const distanceIndicator = document.getElementById('distanceIndicator');
 
 const launchButton = document.getElementById('launchAsteroid');
 const asteroidBtn = document.getElementById('asteroidBtn');
+const timerBtn = document.getElementById('timerBtn');
 const sizeInput = document.getElementById('asteroidSize');
 const massInput = document.getElementById('asteroidMass');
 
@@ -228,6 +229,19 @@ sizeInput.addEventListener('input', () => {
   }
 });
 
+// Helper function to clean up hologram
+function cleanupHologram() {
+  if (hologram) {
+    meshmap['hologram'] = null;
+    scene.remove(hologram);
+    hologram = null;
+    console.log("hologram killed");
+  }
+  window.removeEventListener("mousemove", updateHologram);
+  window.removeEventListener("keydown", placeAsteroid);
+  distanceIndicator.classList.remove('visible');
+}
+
 asteroidBtn.addEventListener('click', () => {
   // Wait a brief moment for gui.js to update placementMode state
   setTimeout(() => {
@@ -238,15 +252,16 @@ asteroidBtn.addEventListener('click', () => {
       distanceIndicator.classList.add('visible');
       console.log("hologram active");
     } else {
-      if (hologram) {
-        meshmap['hologram'] = null;
-        scene.remove(hologram);
-        hologram = null;
-        console.log("hologram killed");
-      }
-      window.removeEventListener("mousemove", updateHologram);
-      window.removeEventListener("keydown", placeAsteroid);
-      distanceIndicator.classList.remove('visible');
+      cleanupHologram();
+    }
+  }, 0);
+})
+
+timerBtn.addEventListener('click', () => {
+  // Clean up hologram when timer is clicked
+  setTimeout(() => {
+    if (!gui.getPlacementMode()) {
+      cleanupHologram();
     }
   }, 0);
 })

@@ -40,6 +40,7 @@ function setupGUI() {
       toggleDisplay(timescaleContainer)
       if (isActive(asteroidContainer)) {
         toggleDisplay(asteroidContainer);
+        placementMode = false; // Disable placement mode when timer is clicked
       };
     });
 

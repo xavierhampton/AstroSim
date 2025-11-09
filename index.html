@@ -5,120 +5,7 @@
         <title>AstroSim</title>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" type="image/png" href="/favicon.png" />
-        <style>
-            body {
-                overflow: hidden;
-                margin: 0px;
-            }
-            /* UI container */
-            .ui-container {
-                position: absolute;
-                top: 20px;
-                right: 20px;        /* move from left to right */
-                display: flex;
-                flex-direction: column; /* stack buttons vertically */
-                gap: 10px;          /* space between buttons */
-                z-index: 10;
-                align-items: flex-end; /* align buttons to the right edge */
-            }
-
-            /* Buttons */
-            .mode-btn {
-                background: rgba(255,255,255,0.1);
-                border: 1px solid #aaa;
-                border-radius: 8px;
-                padding: 8px 12px;
-                aspect-ratio: 1/1;
-                cursor: pointer;
-                transition: 0.2s;
-                display: flex;
-                align-items: center;
-                gap: 5px;
-                color: white;
-                font-family: sans-serif;
-                font-size: 20px;
-                width: 55px;
-                justify-content: center;
-            }
-
-            .mode-btn.active {
-                background: rgba(100, 200, 255, 0.3);
-                border-color: #4af;
-            }
-
-            /* Asteroid menu container */
-            .asteroid-container {
-                display: none;               /* hidden by default, toggle with JS */
-                position: absolute;
-                right: 100%;                 /* position left of the button */
-                top: 0;
-                flex-direction: column;
-                background: rgba(50,50,50,0.8);
-                padding: 8px;
-                border-radius: 6px;
-                margin-right: 5px;
-                gap: 6px;
-                min-width: 80px;
-                z-index: 10;
-            }
-
-            /* Inputs */
-            .asteroid-container input[type="number"] {
-                width: 60px;
-                font-size: 12px;
-                padding: 2px 4px;
-                border-radius: 4px;
-                border: 1px solid #aaa;
-            }
-
-            /* Labels */
-            .asteroid-container label {
-                color: white;
-                font-size: 12px;
-                font-family: sans-serif;
-            }
-
-            /* Launch button */
-            .launch-btn {
-                background: rgba(100, 200, 255, 0.2);
-                border: 1px solid #4af;
-                border-radius: 6px;
-                padding: 4px 6px;
-                color: white;
-                cursor: pointer;
-                font-size: 12px;
-                transition: 0.2s;
-            }
-
-            .launch-btn:hover {
-                background: rgba(100, 200, 255, 0.4);
-            }
-
-
-            /* Timescale slider container */
-            .timescale-container {
-                display: none;             /* hidden by default */
-                position: absolute;        /* absolute relative to wrapper */
-                right: 100%;               /* position to the left of the button */
-                top: 0;                    /* align top edges */
-                flex-direction: column;
-                background: rgba(50,50,50,0.8);
-                padding: 8px;
-                border-radius: 6px;
-                margin-right: 5px;         /* small gap between button and popup */
-            }
-
-            .timescale-container input[type="range"] {
-                accent-color: #4af;
-                width: 120px;
-            }
-            .timescale-container label {
-                color: white;
-                font-size: 12px;
-                margin-bottom: 4px;
-                font-family: sans-serif;
-            }
-        </style>
+        <link rel="stylesheet" href="/style.css" />
 
         <!-- Import maps polyfill -->
         <!-- Remove this when import maps will be widely supported -->
@@ -137,6 +24,15 @@
     </head>
 
     <body>
+        <!-- Start Screen Overlay -->
+        <div id="startScreen" class="start-screen">
+            <div class="start-content">
+                <h1 class="start-title">AstroSim</h1>
+                <p class="start-subtitle">Explore the Cosmos</p>
+                <button id="startButton" class="start-button">Begin Simulation</button>
+            </div>
+        </div>
+
         <div class="ui-container">
             <div style="position: relative; display: flex; align-items: center;">
                 <button id="asteroidBtn" class="mode-btn">☄️</button>

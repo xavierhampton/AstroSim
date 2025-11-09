@@ -39,6 +39,21 @@ composer.addPass(bloomPass);
 const meshmap = {};
 meshmap['asteroids'] = asteroids
 
+// Start Screen Functionality
+const startScreen = document.getElementById('startScreen');
+const startButton = document.getElementById('startButton');
+const uiContainer = document.querySelector('.ui-container');
+
+startButton.addEventListener('click', () => {
+  startScreen.classList.add('fade-out');
+  uiContainer.classList.add('visible');
+
+  // Remove start screen from DOM after fade completes
+  setTimeout(() => {
+    startScreen.style.display = 'none';
+  }, 800);
+});
+
 const launchButton = document.getElementById('launchAsteroid');
 const asteroidBtn = document.getElementById('asteroidBtn');
 const sizeInput = document.getElementById('asteroidSize');

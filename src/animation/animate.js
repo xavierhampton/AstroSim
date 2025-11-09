@@ -90,7 +90,9 @@ function animate(meshmap, controls, render, stats, world, scene, gui) {
               const contactPoint = earthCenter.clone().add(directionToAsteroid.multiplyScalar(earthRadius));
 
               // Create crater and explosion
-              deformEarth(sphere, clouds, contactPoint, 1, 1.5);
+              const radius = body.shapes[0].radius;
+              const strength = body.mass;
+              deformEarth(sphere, clouds, contactPoint, radius, strength);
               spawnExplosion(scene, contactPoint, 100);
               explodeAsteroid(scene, mesh);
 

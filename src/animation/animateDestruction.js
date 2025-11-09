@@ -47,26 +47,38 @@ function deformEarth(earthMesh, clouds, collisionPoint, radius = 0.5, strength =
       tempVec.fromBufferAttribute(position, i);
       const dist = tempVec.distanceTo(localCollision);
       if (dist < radius) {
-        let push = (1 - dist / radius) * strength;
+        // Mass controls depth, radius controls size but reduces depth
+        // Larger radius = wider crater but shallower
+        const depthFactor = strength / (radius * 3); // Mass increases depth, larger radius decreases it
+        let push = (1 - dist / radius) * depthFactor;
 
         // Add subtle noise factor to make rock look jagged and tougher
         const noise = simplex.noise3D(tempVec.x * 3, tempVec.y * 3, tempVec.z * 3);
-        const noiseFactor = 1.0 + noise * 0.5; // ±20% variance
+        const noiseFactor = 1.0 + noise * 0.3; // ±20% variance
 
         // Different toughness based on layer
         if (mesh === earthMesh.children[1]) {
-          // Stone layer: heavily reduced deformation, but rough
-          push *= 0.15 * noiseFactor;
+          // Stone layer: harder, less deformation
+          push *= 0.5 * noiseFactor;
         } else if (mesh === earthMesh.children[2]) {
-          // Core: almost solid
-          push *= 0.1;
+          // Core: hardest, minimal deformation
+          push *= 0.3;
         } else {
-          // Outer crust or clouds
-          push *= 1.0 * noiseFactor;
+          // Outer crust or clouds: most malleable, deforms more to hide stone layer
+          push *= 1.5 * noiseFactor;
         }
 
         const radialDir = tempVec.clone().sub(center).normalize();
-        tempVec.addScaledVector(radialDir, -push);
+
+        // Check how far we'd push, and clamp if it would go past center
+        const currentDist = tempVec.length();
+        const minAllowedDist = 0.2; // Minimum distance from center
+
+        // Only push as much as we can without crossing the minimum
+        const maxPush = currentDist - minAllowedDist;
+        const actualPush = Math.min(push, maxPush);
+
+        tempVec.addScaledVector(radialDir, -actualPush);
         position.setXYZ(i, tempVec.x, tempVec.y, tempVec.z);
       }
     }
@@ -75,11 +87,6 @@ function deformEarth(earthMesh, clouds, collisionPoint, radius = 0.5, strength =
     mesh.geometry.computeVertexNormals();
   });
 }
-
-
-
-
-
 
 function spawnExplosion(scene, position, numParticles = 50) {
   const geometry = new THREE.BufferGeometry();

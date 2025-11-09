@@ -12,6 +12,28 @@ function animate(meshmap, controls, render, stats, world, scene, gui, composer, 
   // Queue of bodies to remove safely
   const bodiesToRemove = [];
 
+  // Audio system for explosion sounds
+  const audioListener = new THREE.AudioListener();
+  camera.add(audioListener);
+  const audioLoader = new THREE.AudioLoader();
+
+  // Load explosion sound buffer (can be reused for multiple sounds)
+  let explosionSoundBuffer = null;
+  audioLoader.load('resources/boom.mp3', function(buffer) {
+    explosionSoundBuffer = buffer;
+  }, undefined, function(error) {
+    console.warn('Explosion sound not loaded. Place explosion.mp3 in resources/');
+  });
+
+  // Function to play explosion sound (creates new instance each time for stacking)
+  function playExplosionSound() {
+    if (!explosionSoundBuffer) return;
+    const sound = new THREE.Audio(audioListener);
+    sound.setBuffer(explosionSoundBuffer);
+    sound.setVolume(0.5);
+    sound.play();
+  }
+
   // Hologram rotation state
   let holoTargetAxis = new THREE.Vector3(Math.random(), Math.random(), Math.random()).normalize();
   let holoAngularSpeed = 0.001;
@@ -71,7 +93,7 @@ function animate(meshmap, controls, render, stats, world, scene, gui, composer, 
     }
 
     // Step the physics world
-    world.step((1 / 60) * timescale * 0.1);
+    world.step((1 / 60) * timescale * 0.05);
 
     // Sync mesh positions & rotations with physics bodies
     Object.values(meshmap).forEach((entry) => {
@@ -126,6 +148,9 @@ function animate(meshmap, controls, render, stats, world, scene, gui, composer, 
               deformEarth(sphere, clouds, contactPoint, craterRadius, impactStrength);
               spawnExplosion(scene, contactPoint, impactStrength, composer, camera);
               explodeAsteroid(scene, mesh, impactStrength, 0.5, composer, camera);
+
+              // Play explosion sound (stacks multiple sounds)
+              playExplosionSound();
 
               // Queue the body for removal
               if (mesh.userData.physicsBody) {

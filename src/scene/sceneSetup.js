@@ -27,7 +27,7 @@ scene.add(sunLight);
 //Ambient Lighting so it isnt black 
 const ambient = new THREE.AmbientLight(0xffffff, 0.4);
 scene.add(ambient);
-
+let asteroids = []
 
 document.body.appendChild(renderer.domElement);
 

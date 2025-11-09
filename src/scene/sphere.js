@@ -37,7 +37,7 @@ function createSphere() {
   });
 
   const core = new THREE.Mesh(geometry.clone(), coreMaterial);
-  core.scale.multiplyScalar(0.4);
+  core.scale.multiplyScalar(0.6);
 
   const stoneMaterial = new THREE.MeshStandardMaterial({
     map: stoneTexture,

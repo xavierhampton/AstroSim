@@ -24,8 +24,22 @@ function applyNBodyGravity(bodies, G = 1) {
       rVec.normalize();
       const force = rVec.scale(forceMag);
 
-      bi.applyForce(force, bi.position);
-      bj.applyForce(force.scale(-1), bj.position);
+      // Don't apply asteroid forces to Earth
+      const isEarthAsteroidPair =
+        (bi.objectType === 'earth' && bj.objectType === 'asteroid') ||
+        (bi.objectType === 'asteroid' && bj.objectType === 'earth');
+
+      if (isEarthAsteroidPair) {
+        // Only apply force to the asteroid
+        if (bi.objectType === 'asteroid') {
+          bi.applyForce(force, bi.position);
+        } else {
+          bj.applyForce(force.scale(-1), bj.position);
+        }
+      } else {
+        bi.applyForce(force, bi.position);
+        bj.applyForce(force.scale(-1), bj.position);
+      }
     }
   }
 }

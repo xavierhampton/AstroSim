@@ -68,6 +68,7 @@ function createSphere() {
   // Earth mass: 2000 units (arbitrary scale - asteroids use same scale)
   const body = addPhysics(earth, world, { shapeType: 'sphere', mass: 2000, radius: 3 });
   body.angularDamping = 0.8;
+  body.objectType = 'earth'; // Mark as Earth for gravity calculations
 
   return earth;
 }

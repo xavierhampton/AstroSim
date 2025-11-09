@@ -146,7 +146,7 @@ function placeAsteroid(event) {
 
   const asteroid = createAsteroid(size);
   spawnAsteroid(asteroid, hologram.position, world, scene, asteroids, mass, size, velocity);
-  if (asteroid.body) asteroid.body.mass = mass; // example if using Cannon.js or Ammo.js
+  if (asteroid.body) asteroid.body.mass = mass; 
 }
 
 asteroidBtn.addEventListener('click', () => {

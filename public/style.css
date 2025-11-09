@@ -272,10 +272,9 @@ body {
     }
 }
 
-/* Info Button (Bottom Right) */
-.info-btn {
+/* Bottom Right Buttons */
+.bottom-right-btn {
     position: absolute;
-    bottom: 20px;
     right: 20px;
     background: rgba(30, 30, 40, 0.85);
     border: 2px solid rgba(100, 200, 255, 0.3);
@@ -310,7 +309,7 @@ body {
     }
 }
 
-.info-btn:hover {
+.bottom-right-btn:hover {
     transform: translateY(-5px) scale(1.05);
     border-color: #4af;
     box-shadow: 0 6px 25px rgba(68, 170, 255, 0.4),
@@ -318,7 +317,7 @@ body {
     background: rgba(40, 50, 70, 0.9);
 }
 
-.info-btn:active {
+.bottom-right-btn:active {
     transform: translateY(-5px) scale(0.98);
 }
 

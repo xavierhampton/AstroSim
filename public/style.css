@@ -11,19 +11,36 @@ body {
     transform: translateX(-50%);
     color: white;
     font-family: 'Courier New', monospace;
-    font-size: 16px;
-    background: rgba(50, 50, 50, 0.8);
-    padding: 8px 16px;
-    border-radius: 6px;
-    border: 1px solid #4af;
+    font-size: 18px;
+    font-weight: 600;
+    background: rgba(30, 30, 40, 0.95);
+    backdrop-filter: blur(15px);
+    padding: 12px 24px;
+    border-radius: 12px;
+    border: 2px solid rgba(100, 200, 255, 0.4);
     z-index: 5;
     opacity: 0;
     pointer-events: none;
-    transition: opacity 0.3s ease;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4),
+                0 0 20px rgba(68, 170, 255, 0.15);
+    letter-spacing: 1px;
 }
 
 .distance-indicator.visible {
     opacity: 1;
+    animation: fadeInDown 0.5s ease-out;
+}
+
+@keyframes fadeInDown {
+    from {
+        transform: translateX(-50%) translateY(-20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(-50%) translateY(0);
+        opacity: 1;
+    }
 }
 
 /* Start Screen Overlay */
@@ -118,7 +135,7 @@ body {
     right: 20px;
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 12px;
     z-index: 10;
     align-items: flex-end;
     opacity: 0;
@@ -127,30 +144,100 @@ body {
 
 .ui-container.visible {
     opacity: 1;
+    animation: slideInRight 0.6s ease-out;
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(100px);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
 }
 
 /* Buttons */
 .mode-btn {
-    background: rgba(255,255,255,0.1);
-    border: 1px solid #aaa;
-    border-radius: 8px;
-    padding: 8px 12px;
+    background: rgba(30, 30, 40, 0.85);
+    border: 2px solid rgba(100, 200, 255, 0.3);
+    border-radius: 12px;
+    padding: 0;
     aspect-ratio: 1/1;
     cursor: pointer;
-    transition: 0.2s;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     display: flex;
     align-items: center;
-    gap: 5px;
+    justify-content: center;
     color: white;
     font-family: sans-serif;
-    font-size: 20px;
-    width: 55px;
-    justify-content: center;
+    font-size: 32px;
+    width: 70px;
+    height: 70px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Staggered button animations */
+.ui-container.visible > div:nth-child(1) .mode-btn,
+.ui-container.visible > div:nth-child(1) {
+    animation: slideInRight 0.6s ease-out 0.1s both;
+}
+
+.ui-container.visible > div:nth-child(2) .mode-btn,
+.ui-container.visible > div:nth-child(2) {
+    animation: slideInRight 0.6s ease-out 0.2s both;
+}
+
+.ui-container.visible > button:nth-child(3) {
+    animation: slideInRight 0.6s ease-out 0.3s both;
+}
+
+.mode-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at center, rgba(100, 200, 255, 0.15), transparent);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.mode-btn:hover {
+    transform: translateX(-5px) scale(1.05);
+    border-color: #4af;
+    box-shadow: 0 6px 25px rgba(68, 170, 255, 0.4),
+                0 0 20px rgba(68, 170, 255, 0.2);
+    background: rgba(40, 50, 70, 0.9);
+}
+
+.mode-btn:hover::before {
+    opacity: 1;
+}
+
+.mode-btn:active {
+    transform: translateX(-5px) scale(0.98);
 }
 
 .mode-btn.active {
-    background: rgba(100, 200, 255, 0.3);
+    background: rgba(100, 200, 255, 0.25);
     border-color: #4af;
+    box-shadow: 0 0 20px rgba(68, 170, 255, 0.5),
+                inset 0 0 10px rgba(68, 170, 255, 0.2);
+    animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        box-shadow: 0 0 20px rgba(68, 170, 255, 0.5),
+                    inset 0 0 10px rgba(68, 170, 255, 0.2);
+    }
+    50% {
+        box-shadow: 0 0 30px rgba(68, 170, 255, 0.7),
+                    inset 0 0 15px rgba(68, 170, 255, 0.3);
+    }
 }
 
 /* Asteroid menu container */
@@ -160,45 +247,88 @@ body {
     right: 100%;
     top: 0;
     flex-direction: column;
-    background: rgba(50,50,50,0.8);
-    padding: 8px;
-    border-radius: 6px;
-    margin-right: 5px;
-    gap: 6px;
-    min-width: 80px;
+    background: rgba(30, 30, 40, 0.95);
+    backdrop-filter: blur(15px);
+    padding: 14px 16px;
+    border-radius: 12px;
+    margin-right: 10px;
+    gap: 10px;
+    min-width: 140px;
     z-index: 10;
+    border: 2px solid rgba(100, 200, 255, 0.3);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4),
+                0 0 20px rgba(68, 170, 255, 0.1);
+    animation: slideInLeft 0.3s ease-out;
+}
+
+@keyframes slideInLeft {
+    from {
+        transform: translateX(20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
 }
 
 /* Inputs */
-.asteroid-container input[type="number"] {
-    width: 60px;
-    font-size: 12px;
-    padding: 2px 4px;
-    border-radius: 4px;
-    border: 1px solid #aaa;
+.asteroid-container input[type="number"],
+.timescale-container input[type="number"] {
+    width: 100%;
+    font-size: 14px;
+    padding: 6px 10px;
+    border-radius: 8px;
+    border: 2px solid rgba(100, 200, 255, 0.3);
+    background: rgba(20, 20, 30, 0.8);
+    color: white;
+    font-family: 'Courier New', monospace;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+}
+
+.asteroid-container input[type="number"]:focus,
+.timescale-container input[type="number"]:focus {
+    outline: none;
+    border-color: #4af;
+    box-shadow: 0 0 10px rgba(68, 170, 255, 0.4);
+    background: rgba(30, 30, 50, 0.9);
 }
 
 /* Labels */
-.asteroid-container label {
-    color: white;
-    font-size: 12px;
-    font-family: sans-serif;
+.asteroid-container label,
+.timescale-container label {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 13px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    margin-bottom: 2px;
 }
 
 /* Launch button */
 .launch-btn {
     background: rgba(100, 200, 255, 0.2);
-    border: 1px solid #4af;
-    border-radius: 6px;
-    padding: 4px 6px;
+    border: 2px solid #4af;
+    border-radius: 8px;
+    padding: 8px 12px;
     color: white;
     cursor: pointer;
-    font-size: 12px;
-    transition: 0.2s;
+    font-size: 13px;
+    transition: all 0.3s ease;
+    font-weight: 600;
+    letter-spacing: 0.5px;
 }
 
 .launch-btn:hover {
     background: rgba(100, 200, 255, 0.4);
+    box-shadow: 0 4px 15px rgba(68, 170, 255, 0.3);
+    transform: translateY(-2px);
+}
+
+.launch-btn:active {
+    transform: translateY(0);
 }
 
 /* Timescale slider container */
@@ -208,20 +338,54 @@ body {
     right: 100%;
     top: 0;
     flex-direction: column;
-    background: rgba(50,50,50,0.8);
-    padding: 8px;
-    border-radius: 6px;
-    margin-right: 5px;
+    background: rgba(30, 30, 40, 0.95);
+    backdrop-filter: blur(15px);
+    padding: 14px 16px;
+    border-radius: 12px;
+    margin-right: 10px;
+    border: 2px solid rgba(100, 200, 255, 0.3);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4),
+                0 0 20px rgba(68, 170, 255, 0.1);
+    animation: slideInLeft 0.3s ease-out;
 }
 
 .timescale-container input[type="range"] {
     accent-color: #4af;
-    width: 120px;
+    width: 140px;
+    height: 6px;
+    cursor: pointer;
+    background: rgba(100, 200, 255, 0.2);
+    border-radius: 10px;
+    outline: none;
 }
 
-.timescale-container label {
-    color: white;
-    font-size: 12px;
-    margin-bottom: 4px;
-    font-family: sans-serif;
+.timescale-container input[type="range"]::-webkit-slider-thumb {
+    width: 18px;
+    height: 18px;
+    background: linear-gradient(135deg, #4af, #8ff);
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 0 10px rgba(68, 170, 255, 0.6);
+    transition: all 0.2s ease;
+}
+
+.timescale-container input[type="range"]::-webkit-slider-thumb:hover {
+    transform: scale(1.2);
+    box-shadow: 0 0 15px rgba(68, 170, 255, 0.8);
+}
+
+.timescale-container input[type="range"]::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    background: linear-gradient(135deg, #4af, #8ff);
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 0 10px rgba(68, 170, 255, 0.6);
+    transition: all 0.2s ease;
+    border: none;
+}
+
+.timescale-container input[type="range"]::-moz-range-thumb:hover {
+    transform: scale(1.2);
+    box-shadow: 0 0 15px rgba(68, 170, 255, 0.8);
 }

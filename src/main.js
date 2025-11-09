@@ -94,21 +94,6 @@ asteroidBtn.addEventListener('click', () => {
   }
 })
 
-// Launch asteroid button
-launchButton.addEventListener('click', () => {
-    const size = parseFloat(sizeInput.value) || 1;
-    const mass = parseFloat(massInput.value) || 1;
-
-    // Create asteroid with chosen size
-    const asteroid = createAsteroid(size);
-
-    // Spawn asteroid in front of camera and add to scene
-    spawnAsteroid(asteroid, camera, world, scene, asteroids, mass, size);
-
-    // Update physics mass after spawn if your physics library allows
-    if (asteroid.body) asteroid.body.mass = mass; // example if using Cannon.js or Ammo.js
-});
-
 function render() {
   renderer.render(scene, camera);
 }

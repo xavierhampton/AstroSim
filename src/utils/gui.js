@@ -46,8 +46,8 @@ function setupGUI() {
         let val = parseFloat(e.target.value);
         if (isNaN(val)) return (timescaleNumber.value = timescale);
 
-        // Clamp between 0 and 10
-        val = Math.min(Math.max(val, 0), 10);
+        // Clamp between 0 and 100
+        val = Math.min(Math.max(val, 0), 100);
         updateTimescale(val);
     });
 

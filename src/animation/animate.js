@@ -2,12 +2,7 @@ import * as CANNON from 'cannon-es';
 import * as THREE from 'three'
 import { applyNBodyGravity, spawnExplosion, deformEarth, explodeAsteroid } from "./animateDestruction.js"
 
-let clouds;
-let sphere;
-
 function animate(meshmap, controls, render, stats, world, scene, gui, composer, camera) {
-  sphere = meshmap["sphere"];
-  clouds = meshmap["clouds"];
   const speed = 0.00001;
   const xspeed = 6;
 
@@ -17,14 +12,18 @@ function animate(meshmap, controls, render, stats, world, scene, gui, composer, 
   // Queue of bodies to remove safely
   const bodiesToRemove = [];
 
-  // Hologram rotation state 
+  // Hologram rotation state
   let holoTargetAxis = new THREE.Vector3(Math.random(), Math.random(), Math.random()).normalize();
-  let holoAngularSpeed = 0.001; 
-  let holoNextChange = performance.now() + 3000; 
+  let holoAngularSpeed = 0.001;
+  let holoNextChange = performance.now() + 3000;
 
   function loop() {
     let timescale = gui.getTimescale();
     requestAnimationFrame(loop);
+
+    // Always get latest references from meshmap
+    const sphere = meshmap["sphere"];
+    const clouds = meshmap["clouds"];
 
     // Rotate clouds map
     if (clouds.material.map) {

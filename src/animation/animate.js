@@ -117,9 +117,9 @@ function animate(meshmap, controls, render, stats, world, scene, gui, composer, 
 
               // Scale crater size and strength for realistic deformation
               // Crater radius is typically 10-20x the projectile radius
-              const craterRadius = asteroidRadius * 15;
+              const craterRadius = asteroidRadius * 4;
               // Impact strength scaled by mass and velocity
-              const impactStrength = asteroidMass * 2;
+              const impactStrength = asteroidMass * 1;
 
               deformEarth(sphere, clouds, contactPoint, craterRadius, impactStrength);
               spawnExplosion(scene, contactPoint, impactStrength, composer, camera);

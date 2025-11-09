@@ -56,24 +56,55 @@ const gui = setupGUI();
 
 let hologram = null;
 
+const placementOffset = 1.5;
+const earthRadius = 3;
+
 function updateHologram(event) {
   mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
   mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
 
   raycaster.setFromCamera(mouse, camera);
 
-  // Plane normal = camera direction, passes through Earth
-  placementPlane.setFromNormalAndCoplanarPoint(camera.getWorldDirection(new THREE.Vector3()), sphere.position);
+  const earthPos = sphere.position.clone();
+  const minDistance = earthRadius + placementOffset;
+  const hologramPos = new THREE.Vector3();
 
-  const intersectPoint = new Vector3();
-  raycaster.ray.intersectPlane(placementPlane, intersectPoint);
+  // Vector from ray origin to sphere center
+  const originToCenter = new THREE.Vector3().subVectors(camera.position, earthPos);
+  const dir = raycaster.ray.direction.clone().normalize();
 
-  if (hologram) {
-    hologram.position.copy(intersectPoint);
+  // Ray-sphere intersection formula
+  const a = dir.dot(dir); // should be 1 since normalized
+  const b = 2 * originToCenter.dot(dir);
+  const c = originToCenter.dot(originToCenter) - minDistance * minDistance;
+  const discriminant = b * b - 4 * a * c;
+
+  if (discriminant >= 0) {
+    // Ray intersects the sphere: pick the nearest positive t
+    const t1 = (-b - Math.sqrt(discriminant)) / (2 * a);
+    const t2 = (-b + Math.sqrt(discriminant)) / (2 * a);
+    const t = t1 > 0 ? t1 : t2; // nearest positive intersection
+    if (t > 0) {
+      hologramPos.copy(camera.position).addScaledVector(dir, t);
+    }
   }
 
-  // Optional: draw line from Earth center to hologram
+  // If no intersection, fall back to plane intersection
+  if (!hologramPos.length()) {
+    placementPlane.setFromNormalAndCoplanarPoint(
+      camera.getWorldDirection(new THREE.Vector3()),
+      sphere.position
+    );
+    raycaster.ray.intersectPlane(placementPlane, hologramPos);
+  }
+
+  // Update hologram
+  if (hologram) hologram.position.copy(hologramPos);
 }
+
+
+
+
 
 function placeAsteroid(event) {
   if (event.code !== "Space") {

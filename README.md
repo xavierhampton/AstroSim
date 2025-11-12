@@ -1,48 +1,76 @@
-# AstroSim
+# AstroSim: Layered Earth Destruction and N-Body Simulation
 
-## Inspiration
-With the theme of space, we wanted to push our boundaries and create a compelling physics simulation. We envisioned a system where a planet could be deformed and destroyed in real-time, and asteroids became the natural choice to achieve this. The goal was to explore both 3D rendering and physics in a visually engaging way, while tackling real challenges in simulation design.
+AstroSim is an interactive 3D space simulation that visualizes asteroid collisions, orbital motion, and large-scale gravitational interactions in real time. Built with **Three.js** and **Cannon-ES**, it combines physics simulation with procedural deformation and post-processing effects to create a dynamic planetary environment.
 
-## What it does
-AstroSim allows users to interact with a 3D Earth and strategically place asteroids around it. Key features include:
+---
 
-- **Holographic asteroid placement:** Position asteroids near or around the planet in 3D space before launching them.  
-- **Earth deformation and destruction:** Realistic crater generation using physics-based calculations.  
-- **Independent cloud movement:** Clouds move separately from the Earth mesh, maintaining realism even after deformation.  
-- **Interactive GUI controls:** Adjust camera and simulation parameters dynamically.  
+## Overview
 
-## How we built it
-We used a modern JavaScript stack including **Vite**, **Three.js**, and **Node.js**. The project relied heavily on vector math for hologram placement, physics calculations for crater generation, and texture mapping techniques for independent cloud movement. Tools like **Claude** and **ChatGPT** assisted in generating portions of the code and solving implementation challenges.
+AstroSim allows users to spawn asteroids, simulate realistic orbital paths, and observe physical interactions such as impacts and debris formation. The simulation integrates:
+- **N-Body gravity** for dynamic asteroid movement  
+- **Procedural Earth deformation** for crater formation  
+- **Camera and bloom effects** for visual impact and immersion  
 
-## Challenges we ran into
-Some of the major challenges included:
+---
 
-1. **Asteroid placement system:**  
-   - Original click-based placement often caused asteroids to spawn inside the Earth.  
-   - Launch-from-camera approach was visually unappealing and still risked spawning inside Earth when the camera was close.  
-   - The final solution uses a **holographic asteroid at the mouse cursor**, constrained to a plane normal to the Earth and camera, with a radius limit to prevent intersection.
+## N-Body Gravity
 
-2. **Texture mapping for clouds:**  
-   - Initial textures had obvious poles, causing visual artifacts.  
-   - Rotating the cloud mesh after Earth deformation caused misalignment.  
-   - Solved by rotating the **texture itself**, rather than the mesh, keeping cloud movement consistent.
+The simulation applies Newtonian gravity between all valid bodies. Each body exerts a force proportional to its mass and inversely proportional to the square of the distance between them:
 
-3. **N-Body physics calculations:**  
-   - Implementing realistic asteroid collisions and cratering required careful vector math and optimization.  
+\[
+F = G \frac{m_1 m_2}{r^2}
+\]
 
-## Accomplishments that we're proud of
-- Smooth holographic asteroid placement in 3D space.  
-- Realistic Earth deformation with accurate crater formation.  
-- Clean and functional GUI for camera and simulation control.  
-- Overcoming complex technical challenges in both physics and rendering.  
+This system enables orbital motion without external physics engines beyond Cannon-ES constraints.
 
-## What we learned
-- First exposure to **Three.js** and advanced JavaScript concepts.  
-- Physics simulation techniques including N-Body dynamics and collision response.  
-- Vector math for mapping 3D cursor positions to holographic objects.  
-- Texture mapping techniques for dynamic meshes.  
+---
 
-## What's next for AstroSim
-- Implementing **orbits**, enabling objects to revolve around planets.  
-- Expanding to a full **solar system destruction simulator**.  
-- Improving visual fidelity and interactivity based on user feedback.  
+## Layered Earth Deformation System
+
+The Earth is composed of **five concentric layers**, each representing a physical zone with unique toughness:
+
+1. **Cloud Layer** – atmospheric shell; highly deformable and visual only  
+2. **Crust** – primary surface; most responsive to impacts  
+3. **Mantle (Stone Layer)** – denser structure; moderate deformation  
+4. **Core Shell** – rigid; limited deformation  
+5. **Inner Core** – static; structural anchor
+
+When an asteroid collides with the Earth, deformation is applied per-vertex in the affected region. Vertices within the impact radius are displaced **inward along their normal vectors**, simulating crater formation.
+
+Each deformation magnitude is influenced by:
+- **Distance falloff** – closer vertices deform more  
+- **Material hardness** – deeper layers resist compression  
+- **Procedural noise** – uses *Simplex noise* to create jagged, non-uniform crater edges  
+- **Cumulative limits** – prevents vertices from collapsing past a safe minimum radius  
+
+By pushing vertices inward rather than breaking geometry apart, the deformation is both **visually convincing and computationally efficient**, requiring only buffer updates and normal recomputation.
+
+---
+
+## Efficiency and Design
+
+- **No remeshing or reconstruction:** operates directly on existing vertex buffers  
+- **Local updates only:** modifies vertices near the collision point  
+- **Physics decoupled from rendering:** deformation runs on the render mesh while physics runs on simplified Cannon bodies  
+- **Layer differentiation:** visual and physical effects determined by layer index  
+
+This structure allows for multiple impacts, maintaining performance even at high asteroid counts.
+
+---
+
+
+| Category | Tools |
+|-----------|-------|
+| 3D Rendering | [Three.js](https://threejs.org/) |
+| Physics Simulation | [Cannon-ES](https://github.com/pmndrs/cannon-es) |
+| Procedural Noise | [Simplex-Noise](https://www.npmjs.com/package/simplex-noise) |
+| Post-Processing | [UnrealBloomPass](https://threejs.org/docs/#examples/en/postprocessing/UnrealBloomPass) |
+| Build & Bundling | [Vite](https://vitejs.dev/) |
+
+---
+
+## Acknowledgements
+- **Earth & Cloud Texture:** [Solar System Scope](https://www.solarsystemscope.com/textures/)  
+- **Asteroid Texture:** [Freepik](https://www.freepik.com/free-photo/photo-stone-texture-pattern_226230331.htm)
+- **Threejs Boilerplate** [Sean-Bradley’s Three.js Boilerplate](https://github.com/Sean-Bradley/Threejs-Boilerplate)
+

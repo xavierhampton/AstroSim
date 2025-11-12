@@ -2,6 +2,10 @@
 
 AstroSim is an interactive 3D space simulation that visualizes asteroid collisions, orbital motion, and large-scale gravitational interactions in real time. Built with **Three.js** and **Cannon-ES**, it combines physics simulation with procedural deformation and post-processing effects to create a dynamic planetary environment.
 
+
+
+<img src="https://github.com/xavierhampton/AstroSim/blob/main/public/resources/planets.png">
+
 ---
 
 ## Overview
@@ -73,4 +77,5 @@ This structure allows for multiple impacts, maintaining performance even at high
 - **Earth & Cloud Texture:** [Solar System Scope](https://www.solarsystemscope.com/textures/)  
 - **Asteroid Texture:** [Freepik](https://www.freepik.com/free-photo/photo-stone-texture-pattern_226230331.htm)
 - **Threejs Boilerplate** [Sean-Bradley’s Three.js Boilerplate](https://github.com/Sean-Bradley/Threejs-Boilerplate)
+
 

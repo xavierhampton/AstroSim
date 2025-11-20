@@ -1,7 +1,8 @@
 {
   "permissions": {
     "allow": [
-      "Bash(node app.js:*)"
+      "Bash(node app.js:*)",
+      "Bash(npm run build:*)"
     ],
     "deny": [],
     "ask": []

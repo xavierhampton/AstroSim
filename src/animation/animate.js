@@ -114,60 +114,150 @@ function animate(meshmap, controls, render, stats, world, scene, gui, composer, 
           // Attach collision listener once
           if (!body.hasCollisionListener && sphere.userData.physicsBody) {
             body.addEventListener('collide', (event) => {
-              // Only process collision with sphere
-              if (!event || !event.body || event.body !== sphere.userData.physicsBody) return;
+              if (!event || !event.body) return;
               if (mesh.userData?.exploded) return;
               if (!event.contact) return;
 
-              mesh.userData = mesh.userData || {};
-              mesh.userData.exploded = true;
+              // Handle collision with Earth
+              if (event.body === sphere.userData.physicsBody) {
+                mesh.userData = mesh.userData || {};
+                mesh.userData.exploded = true;
 
-              // Get the asteroid's position at impact
-              const asteroidPos = new THREE.Vector3(
-                body.position.x,
-                body.position.y,
-                body.position.z
-              );
+                // Get the asteroid's position at impact
+                const asteroidPos = new THREE.Vector3(
+                  body.position.x,
+                  body.position.y,
+                  body.position.z
+                );
 
-              // Get Earth's center
-              const earthCenter = sphere.position.clone();
-              const earthRadius = 3; // Match the radius from sphere.js
+                // Get Earth's center
+                const earthCenter = sphere.position.clone();
+                const earthRadius = 3; // Match the radius from sphere.js
 
-              // Calculate impact point: project asteroid position onto Earth's surface
-              // Direction from Earth center to asteroid
-              const directionToAsteroid = asteroidPos.clone().sub(earthCenter).normalize();
+                // Calculate impact point: project asteroid position onto Earth's surface
+                // Direction from Earth center to asteroid
+                const directionToAsteroid = asteroidPos.clone().sub(earthCenter).normalize();
 
-              // Contact point is on Earth's surface in that direction
-              const contactPoint = earthCenter.clone().add(directionToAsteroid.multiplyScalar(earthRadius));
+                // Contact point is on Earth's surface in that direction
+                const contactPoint = earthCenter.clone().add(directionToAsteroid.multiplyScalar(earthRadius));
 
-              // Create crater and explosion
-              const asteroidRadius = body.shapes[0].radius;
-              const asteroidMass = body.mass;
+                // Create crater and explosion
+                const asteroidRadius = body.shapes[0].radius;
+                const asteroidMass = body.mass;
 
-              // Scale crater size and strength for realistic deformation
-              // Crater radius is typically 10-20x the projectile radius
-              const craterRadius = asteroidRadius * 4;
-              // Impact strength scaled by mass and velocity
-              const impactStrength = asteroidMass * 1;
+                // Scale crater size and strength for realistic deformation
+                // Crater radius is typically 10-20x the projectile radius
+                const craterRadius = asteroidRadius * 4;
+                // Impact strength scaled by mass and velocity
+                const impactStrength = asteroidMass * 1;
 
-              deformEarth(sphere, clouds, contactPoint, craterRadius, impactStrength);
-              spawnExplosion(scene, contactPoint, impactStrength, composer, camera);
-              explodeAsteroid(scene, mesh, impactStrength, 0.5, composer, camera);
+                deformEarth(sphere, clouds, contactPoint, craterRadius, impactStrength);
+                spawnExplosion(scene, contactPoint, impactStrength, composer, camera);
+                explodeAsteroid(scene, mesh, impactStrength, 0.5, composer, camera);
 
-              // Play explosion sound (stacks multiple sounds)
-              playExplosionSound();
+                // Play explosion sound (stacks multiple sounds)
+                playExplosionSound();
 
-              // Queue the body for removal
-              if (mesh.userData.physicsBody) {
-                bodiesToRemove.push(mesh.userData.physicsBody);
-                mesh.userData.physicsBody = null;
+                // Queue the body for removal
+                if (mesh.userData.physicsBody) {
+                  bodiesToRemove.push(mesh.userData.physicsBody);
+                  mesh.userData.physicsBody = null;
+                }
+
+                // Remove mesh from scene and meshmap
+                scene.remove(mesh);
+                if (Array.isArray(meshmap["asteroids"])) {
+                  const idx = meshmap["asteroids"].indexOf(mesh);
+                  if (idx > -1) meshmap["asteroids"].splice(idx, 1);
+                }
+                return;
               }
 
-              // Remove mesh from scene and meshmap
-              scene.remove(mesh);
-              if (Array.isArray(meshmap["asteroids"])) {
-                const idx = meshmap["asteroids"].indexOf(mesh);
-                if (idx > -1) meshmap["asteroids"].splice(idx, 1);
+              // Handle asteroid-to-asteroid collision
+              if (event.body.objectType === 'asteroid') {
+                // Find the other asteroid mesh
+                let otherMesh = null;
+                if (Array.isArray(meshmap["asteroids"])) {
+                  otherMesh = meshmap["asteroids"].find(m => m.userData.physicsBody === event.body);
+                }
+
+                if (!otherMesh || otherMesh.userData?.exploded) return;
+
+                // Get both asteroid properties
+                const radius1 = body.shapes[0].radius;
+                const radius2 = event.body.shapes[0].radius;
+                const mass1 = body.mass;
+                const mass2 = event.body.mass;
+
+                // Determine which is smaller
+                let smallerMesh, smallerBody, largerMesh, largerBody;
+                let smallerRadius, largerRadius, smallerMass, largerMass;
+
+                if (radius1 < radius2) {
+                  smallerMesh = mesh;
+                  smallerBody = body;
+                  largerMesh = otherMesh;
+                  largerBody = event.body;
+                  smallerRadius = radius1;
+                  largerRadius = radius2;
+                  smallerMass = mass1;
+                  largerMass = mass2;
+                } else {
+                  smallerMesh = otherMesh;
+                  smallerBody = event.body;
+                  largerMesh = mesh;
+                  largerBody = body;
+                  smallerRadius = radius2;
+                  largerRadius = radius1;
+                  smallerMass = mass2;
+                  largerMass = mass1;
+                }
+
+                // Prevent double-processing
+                if (smallerMesh.userData?.exploded) return;
+                smallerMesh.userData = smallerMesh.userData || {};
+                smallerMesh.userData.exploded = true;
+
+                // Get collision point
+                const collisionPos = new THREE.Vector3(
+                  smallerBody.position.x,
+                  smallerBody.position.y,
+                  smallerBody.position.z
+                );
+
+                // Calculate impact strength for particles
+                const impactStrength = smallerMass * 0.5;
+
+                // Spawn explosion at collision point
+                spawnExplosion(scene, collisionPos, impactStrength, composer, camera);
+                explodeAsteroid(scene, smallerMesh, impactStrength, 0.3, composer, camera);
+
+                // Play explosion sound
+                playExplosionSound();
+
+                // Remove smaller asteroid
+                if (smallerMesh.userData.physicsBody) {
+                  bodiesToRemove.push(smallerMesh.userData.physicsBody);
+                  smallerMesh.userData.physicsBody = null;
+                }
+                scene.remove(smallerMesh);
+                if (Array.isArray(meshmap["asteroids"])) {
+                  const idx = meshmap["asteroids"].indexOf(smallerMesh);
+                  if (idx > -1) meshmap["asteroids"].splice(idx, 1);
+                }
+
+                // Shrink larger asteroid
+                const shrinkFactor = 0.85; // Shrink to 85% of original size
+                const newRadius = largerRadius * shrinkFactor;
+                const newMass = largerMass * (shrinkFactor ** 3); // Volume scales with r^3
+
+                // Update physics body
+                largerBody.shapes[0].radius = newRadius;
+                largerBody.mass = newMass;
+                largerBody.updateMassProperties();
+
+                // Update mesh scale
+                largerMesh.scale.multiplyScalar(shrinkFactor);
               }
             });
             body.hasCollisionListener = true;

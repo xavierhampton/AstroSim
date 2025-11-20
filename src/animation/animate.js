@@ -27,7 +27,7 @@ function animate(meshmap, controls, render, stats, world, scene, gui, composer, 
 
   // Volume control - exposed globally via window for UI control
   if (!window.audioSettings) {
-    window.audioSettings = { volume: 0.5 };
+    window.audioSettings = { volume: 0.05 };
   }
 
   // Function to play explosion sound (creates new instance each time for stacking)

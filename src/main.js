@@ -67,16 +67,16 @@ const volumeValue = document.getElementById('volumeValue');
 
 // Initialize audio settings if not already set
 if (!window.audioSettings) {
-  window.audioSettings = { volume: 0.5 };
+  window.audioSettings = { volume: 0.05 };
 }
 
 // Set initial volume from slider value on load
-window.audioSettings.volume = volumeSlider.value / 100;
+window.audioSettings.volume = volumeSlider.value / 1000;
 volumeValue.textContent = `${volumeSlider.value}%`;
 
 // Update volume when slider changes
 volumeSlider.addEventListener('input', (e) => {
-  const volume = e.target.value / 100;
+  const volume = e.target.value / 1000;
   window.audioSettings.volume = volume;
   volumeValue.textContent = `${e.target.value}%`;
 });

@@ -71,8 +71,11 @@ function spawnAsteroid(asteroid, position, world, scene, asteroids, mass, size, 
   const body = addPhysics(asteroid, world, { shapeType: 'sphere', mass: mass, radius: size });
   body.objectType = 'asteroid'; // Mark as asteroid for gravity calculations
 
-  // Reduce spinning by adding angular damping
-  body.angularDamping = 0.99; // Higher = less spinning (0-1 range)
+  // Heavily reduce spinning by adding high angular damping
+  body.angularDamping = 0.999; // Higher = less spinning (0-1 range)
+
+  // Limit angular velocity to prevent super-fast spinning
+  body.angularVelocity.set(0, 0, 0);
 
   // Apply initial velocity if provided
   if (velocity) {

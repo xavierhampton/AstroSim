@@ -108,6 +108,17 @@ function animate(meshmap, controls, render, stats, world, scene, gui, composer, 
           const body = mesh.userData?.physicsBody;
           if (!body) return;
 
+          // Limit angular velocity to prevent super-fast spinning
+          const maxAngularSpeed = 2; // radians per second
+          const angVel = body.angularVelocity;
+          const angSpeed = Math.sqrt(angVel.x ** 2 + angVel.y ** 2 + angVel.z ** 2);
+          if (angSpeed > maxAngularSpeed) {
+            const scale = maxAngularSpeed / angSpeed;
+            angVel.x *= scale;
+            angVel.y *= scale;
+            angVel.z *= scale;
+          }
+
           mesh.position.copy(body.position);
           mesh.quaternion.copy(body.quaternion);
 

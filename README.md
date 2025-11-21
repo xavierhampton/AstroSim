@@ -21,7 +21,7 @@ AstroSim allows users to spawn asteroids, simulate realistic orbital paths, and 
 
 The simulation applies Newtonian gravity between all valid bodies. Each body exerts a force proportional to its mass and inversely proportional to the square of the distance between them:
 
-![Equation](https://latex.codecogs.com/svg.latex?F%20=%20G%20\frac{m_1%20m_2}{r^2})
+![Equation](https://latex.codecogs.com/svg.latex?\Large\color{cyan}F%20=%20G%20\frac{m_1%20m_2}{r^2})
 
 This system enables orbital motion without external physics engines beyond Cannon-ES constraints.
 
@@ -75,6 +75,7 @@ This structure allows for multiple impacts, maintaining performance even at high
 - **Earth & Cloud Texture:** [Solar System Scope](https://www.solarsystemscope.com/textures/)  
 - **Asteroid Texture:** [Freepik](https://www.freepik.com/free-photo/photo-stone-texture-pattern_226230331.htm)
 - **Threejs Boilerplate** [Sean-Bradley’s Three.js Boilerplate](https://github.com/Sean-Bradley/Threejs-Boilerplate)
+
 
 
 
